@@ -19,25 +19,37 @@ The key is the optional custom URL.
 
 These functions are specified in the repl.it DB.
 
-> `Get(String key)`
+> `get(String key)`
 
 Gets a key. Returns Promise.
 ```js
 Client.get("key").then(console.log);
 ```
 
-> `Set(String key, String value)`
+> `set(String key, String value)`
 
 Sets a key to value. Returns Client. 
 
-> `Delete(String key)`
+> `delete(String key)`
 
 Deletes a key. Returns Client.
 
-> `List(String? prefix)`
+> `list(String? prefix)`
 
 Lists all of the keys, or all of the keys starting with `prefix` if specifed.
 
 **Dynamic Functions**
 
 These functions have been added by me.
+
+> `empty()`
+
+Clears the database. Returns Client
+
+> `getAll()`
+
+Get all key/value pairs and return as an object.
+
+> `setAll(Object obj)`
+
+Sets the entire database through a key/value object. Returns Client

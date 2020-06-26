@@ -62,7 +62,7 @@ class Client {
   }
 
   /**
-   * Get all objects and return as an object
+   * Get all key/value pairs and return as an object
    */
   async getAll() {
     let output = {};

@@ -1,14 +1,14 @@
 export class Client {
-  constructor(key?: String): Client
-
+  constructor(key?: String)
+  
   // Native
-  public async get(key: String): Promise<String>
-  public async set(key: String, value: String): Client
-  public async delete(key: String): Client
-  public async list(prefix?: String): Promise<String>
+  public get(key: String): Promise<String>
+  public set(key: String, value: String): Client
+  public delete(key: String): Client
+  public list(prefix?: String): Promise<String>
 
   // Dynamic
-  public async empty(): Client
-  public async getAll(): Object
-  public async setAll(obj: Object): Client
+  public empty(): Client
+  public getAll(): Object
+  public setAll(obj: Object): Client
 }
