@@ -9,3 +9,24 @@ await Client.set("key", "value");
 let key = await Client.get("key");
 console.log(key);
 ```
+
+## Docs
+### class Client
+> `Get(String key)`
+
+Gets a key. Returns Promise.
+```js
+Client.get("key").then(console.log);
+```
+
+> `Set(String key, String value)`
+
+Sets a key to value. Returns Client. 
+
+> `Delete(String key)`
+
+Deletes a key. Returns Client.
+
+> `List(String? prefix)`
+
+Lists all of the keys, or all of the keys starting with `prefix` if specifed.

@@ -17,7 +17,7 @@ class Client {
   }
 
   async delete(key) {
-    return await fetch(this.key + "/" + key, { method: "DELETE" });
+    await fetch(this.key + "/" + key, { method: "DELETE" });
     return this;
   }
 
