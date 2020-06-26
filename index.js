@@ -33,7 +33,7 @@ class Client {
           // Try to parse as JSON, if it fails, we throw
           value = JSON.parse(strValue);
         } catch (_err) {
-          throw new SyntaxError(`Failed to parse value of ${key}, try passing a the raw option to get the raw value`);
+          throw new SyntaxError(`Failed to parse value of ${key}, try passing a raw option to get the raw value`);
         }
 
         if (value === null || value === undefined) {
@@ -81,9 +81,14 @@ class Client {
   async empty() {
     let data = await this.list();
     data = data.split("\n");
-    data.forEach(async el => {
-      await this.delete(el);
-    });
+    
+    const promises = []
+    for (const el of data) {
+      promises.push(this.delete(el));
+    }
+
+    await Promise.all(promises);
+
     return this;
   }
 
@@ -94,7 +99,8 @@ class Client {
     let output = {};
     let data = await this.list();
     data = data.split("\n");
-    for (const key in data) {
+
+    for (const key of data) {
       let value = await this.get(key);
       output[key] = value;
     }
@@ -106,7 +112,7 @@ class Client {
    * @param {Object} obj The object.
    */
   async setAll(obj) {
-    for (const key of obj) {
+    for (const key in obj) {
       let val = obj[key];
       await this.set(key, val);
     }

@@ -4,7 +4,7 @@
   "description": "A simple client for repl.it db",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "keywords": [
     "db"
@@ -13,5 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "jest": "^26.1.0"
   }
 }

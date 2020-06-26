@@ -22,14 +22,14 @@ The key is the optional custom URL.
 
 These functions are specified in the repl.it DB.
 
-> `get(String key)`
+> `get(String key, Object options?)`
 
 Gets a key. Returns Promise.
 ```js
-Client.get("key").then(console.log);
+Client.get("key", { raw: false }).then(console.log);
 ```
 
-> `set(String key, String value)`
+> `set(String key, Any value)`
 
 Sets a key to value. Returns Client. 
 
