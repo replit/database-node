@@ -2,7 +2,7 @@ export class Client {
   constructor(key?: string)
   
   // Native
-  public get(key: string, options?: { raw?: boolean }): Promise<string>
+  public get(key: string, options?: { raw?: boolean }): Promise<unknown>
   public set(key: string, value: any): Client
   public delete(key: string): Client
   public list(prefix?: string): Promise<string>
