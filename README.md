@@ -11,7 +11,13 @@ console.log(key);
 ```
 
 ## Docs
-### class Client
+### `class Client(String key?)`
+The key is the optional custom URL.
+
+**Native Functions**
+
+These functions are specified in the repl.it DB.
+
 > `Get(String key)`
 
 Gets a key. Returns Promise.
@@ -30,3 +36,7 @@ Deletes a key. Returns Client.
 > `List(String? prefix)`
 
 Lists all of the keys, or all of the keys starting with `prefix` if specifed.
+
+**Dynamic Functions**
+
+These functions have been added by me.
