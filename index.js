@@ -68,7 +68,7 @@ class Client {
     let output = {};
     let data = await this.list();
     data = data.split("\n");
-    data.forEach(el => {
+    data.forEach(async el => {
       let value = await this.get(el);
       output[el] = value;
     });
