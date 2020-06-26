@@ -30,10 +30,11 @@ class Client {
 
         let value = strValue;
         try {
-          // Try to parse as JSON, if it fails
-          // just leave the string value.
+          // Try to parse as JSON, if it fails, we throw
           value = JSON.parse(strValue);
-        } catch (err) {}
+        } catch (_err) {
+          throw new SyntaxError(`Failed to parse value of ${key}, try passing a the raw option to get the raw value`);
+        }
 
         if (value === null || value === undefined) {
           return null;
