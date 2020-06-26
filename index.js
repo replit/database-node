@@ -26,7 +26,7 @@ class Client {
    * @param {String} value Value
    */
   async set(key, value) {
-    await fetch(this.key, { method: "POST", body: key + "=" + value });
+    await fetch(this.key, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: key + "=" + value });
     return this;
   }
 
@@ -68,10 +68,10 @@ class Client {
     let output = {};
     let data = await this.list();
     data = data.split("\n");
-    data.forEach(async el => {
-      let value = await this.get(el);
-      output[el] = value;
-    });
+    for (const key of data) {
+      let value = await client.get(key);
+      output[key] = value;
+    }
     return output;
   }
 
