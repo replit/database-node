@@ -14,19 +14,44 @@ class Client {
   /**
    * Gets a key
    * @param {String} key Key
+   * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
-  async get(key) {
+  async get(key, options) {
     return await fetch(this.key + "/" + key)
-      .then(e => e.text());
+      .then(e => e.text())
+      .then(strValue => {
+        if (options && options.raw) {
+          return strValue;
+        }
+
+        if (!strValue) {
+          return null;
+        }
+
+        let value = strValue;
+        try {
+          // Try to parse as JSON, if it fails
+          // just leave the string value.
+          value = JSON.parse(strValue);
+        } catch (err) {}
+
+        if (value === null || value === undefined) {
+          return null;
+        }
+
+        return value;
+      })
   }
 
   /**
    * Sets a key
    * @param {String} key Key
-   * @param {String} value Value
+   * @param {any} value Value
    */
   async set(key, value) {
-    await fetch(this.key, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: key + "=" + value });
+    const strValue = JSON.stringify(value)
+
+    await fetch(this.key, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: key + "=" + strValue });
     return this;
   }
 
