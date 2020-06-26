@@ -1,3 +1,4 @@
+[![npm version](https://badge.fury.io/js/replitdb-client.svg)](https://badge.fury.io/js/replitdb-client)
 # Repl.it DB Client
 Repl.it-db client is a simple way to use the repl.it database. It uses `await/async`.
 

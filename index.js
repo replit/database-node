@@ -53,7 +53,37 @@ class Client {
    * Clears the database.
    */
   async empty() {
-    await fetch(this.key, { method: "DELETE" });
+    let data = await this.list();
+    data = data.split("\n");
+    data.forEach(async el => {
+      await this.delete(el);
+    });
+    return this;
+  }
+
+  /**
+   * Get all objects and return as an object
+   */
+  async getAll() {
+    let output = {};
+    let data = await this.list();
+    data = data.split("\n");
+    data.forEach(el => {
+      let value = await this.get(el);
+      output[el] = value;
+    });
+    return output;
+  }
+
+  /**
+   * Sets the entire database through an object.
+   * @param {Object} obj The object.
+   */
+  async setAll(obj) {
+    for (const key of obj) {
+      let val = obj[key];
+      await this.set(key, val);
+    }
     return this;
   }
 }
