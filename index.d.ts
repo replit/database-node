@@ -2,13 +2,13 @@ export class Client {
   constructor(key?: string)
   
   // Native
-  public get(key: string): Promise<string>
-  public set(key: string, value: string): Client
+  public get(key: string, options?: { raw?: boolean }): Promise<string>
+  public set(key: string, value: any): Client
   public delete(key: string): Client
   public list(prefix?: string): Promise<string>
 
   // Dynamic
   public empty(): Client
-  public getAll(): Object
-  public setAll(obj: Object): Client
+  public getAll(): Record<any, any>
+  public setAll(obj: Record<any, any>): Client
 }
