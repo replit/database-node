@@ -1,6 +1,6 @@
 {
   "name": "replitdb-client",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A simple client for repl.it db",
   "main": "index.js",
   "scripts": {
