@@ -69,7 +69,7 @@ class Client {
     let data = await this.list();
     data = data.split("\n");
     for (const key of data) {
-      let value = await client.get(key);
+      let value = await this.get(key);
       output[key] = value;
     }
     return output;
