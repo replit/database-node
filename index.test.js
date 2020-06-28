@@ -40,10 +40,14 @@ test('gets a value', async () => {
 test('delete a value', async () => {
   await client.setAll({
     key: "value",
-    deleteThis: "please"
+    deleteThis: "please",
+    somethingElse: "in delete multiple",
+    andAnother: "again same thing"
   })
 
   expect(await client.delete('deleteThis')).toEqual(client);
+  expect(await client.deleteMultiple('somethingElse', 'andAnother')).toEqual(client);
+  expect(await client.list()).toEqual("key")
   expect(await client.empty()).toEqual(client);
   expect(await client.list()).toEqual("");
 })

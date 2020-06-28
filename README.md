@@ -60,3 +60,9 @@ Sets the entire database through a key/value object. Returns Client
 > `deleteMultiple(...String args)`
 
 Deletes multiple keys. Returns client.
+
+## Tests
+```sh
+npm i
+npm run test
+```

@@ -121,7 +121,7 @@ class Client {
 
   /**
    * Delete multiple entries by keys
-   * @param  {Array<string>} args Keys
+   * @param {Array<string>} args Keys
    */
   async deleteMultiple(...args) {
     const promises = [];
