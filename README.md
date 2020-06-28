@@ -56,3 +56,7 @@ Get all key/value pairs and return as an object.
 > `setAll(Object obj)`
 
 Sets the entire database through a key/value object. Returns Client
+
+> `deleteMultiple(...String args)`
+
+Deletes multiple keys. Returns client.

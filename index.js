@@ -118,6 +118,22 @@ class Client {
     }
     return this;
   }
+
+  /**
+   * Delete multiple entries by keys
+   * @param  {Array<string>} args Keys
+   */
+  async deleteMultiple(...args) {
+    const promises = [];
+
+    for (const arg of args) {
+      promises.push(this.delete(arg));
+    }
+
+    await Promise.all(promises);
+
+    return this;
+  }
 }
 
 module.exports = Client;

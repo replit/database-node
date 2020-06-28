@@ -11,4 +11,5 @@ export class Client {
   public empty(): Client
   public getAll(): Record<any, any>
   public setAll(obj: Record<any, any>): Client
+  public deleteMultiple(args: Array<string>): Client
 }
