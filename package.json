@@ -1,16 +1,22 @@
 {
-  "name": "replitdb-client",
-  "version": "2.0.0",
-  "description": "A simple client for repl.it db",
+  "name": "@replit/database",
+  "version": "1.0.0",
+  "description": "Client for Repl.it Database",
   "main": "index.js",
   "scripts": {
     "test": "jest"
   },
-  "keywords": [
-    "db"
+  "contributors": [
+    {
+      "name": "Junhao Zhang",
+      "url": "https://github.com/mrlapizgithub/repl.it-db"
+    }
   ],
-  "author": "Junhao Zhang",
-  "license": "ISC",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/replit/database-node.git"
+  },
   "dependencies": {
     "node-fetch": "^2.6.0"
   },
