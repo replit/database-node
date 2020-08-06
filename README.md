@@ -1,13 +1,13 @@
-[![npm version](https://badge.fury.io/js/replitdb-client.svg)](https://badge.fury.io/js/replitdb-client)
+[![npm version](https://badge.fury.io/js/%40replit%2Fdatabase.svg)](https://badge.fury.io/js/%40replit%2Fdatabase)
 
-[![Run on Repl.it](https://repl.it/badge/github/mrlapizgithub/repl.it-db)](https://repl.it/github/mrlapizgithub/repl.it-db)
+[![Run on Repl.it](https://repl.it/badge/github/replit/database-node)](https://repl.it/github/replit/database-node)
 
-# Repl.it DB Client
-Repl.it-db client is a simple way to use the repl.it database. It uses `await/async`.
+# Repl.it Database client
+Repl.it Database client is a simple way to use Repl.it Database in your Node.js repls. It uses `await/async`.
 
 ## Get started
 ```js
-const Client = require("replitdb-client");
+const Client = require("@replit/database");
 const client = new Client();
 await Client.set("key", "value");
 let key = await Client.get("key");
