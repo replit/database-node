@@ -37,7 +37,7 @@ test("list keys", async () => {
     second: "secondThing",
   });
 
-  expect(await client.list()).toEqual("key\nsecond");
+  expect(await client.list()).toEqual(["key", "second"]);
 });
 
 test("gets a value", async () => {
@@ -60,7 +60,16 @@ test("delete a value", async () => {
   expect(await client.deleteMultiple("somethingElse", "andAnother")).toEqual(
     client
   );
-  expect(await client.list()).toEqual("key");
+  expect(await client.list()).toEqual(["key"]);
   expect(await client.empty()).toEqual(client);
-  expect(await client.list()).toEqual("");
+  expect(await client.list()).toEqual([]);
+});
+
+test("list keys with newline", async () => {
+  await client.setAll({
+    "key\nwit": "first",
+    keywidout: "second",
+  });
+
+  expect(await client.list()).toEqual(["keywidout", "key\nwit"]);
 });

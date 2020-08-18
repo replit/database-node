@@ -18,8 +18,8 @@ class Client {
    */
   async get(key, options) {
     return await fetch(this.key + "/" + key)
-      .then(e => e.text())
-      .then(strValue => {
+      .then((e) => e.text())
+      .then((strValue) => {
         if (options && options.raw) {
           return strValue;
         }
@@ -33,7 +33,9 @@ class Client {
           // Try to parse as JSON, if it fails, we throw
           value = JSON.parse(strValue);
         } catch (_err) {
-          throw new SyntaxError(`Failed to parse value of ${key}, try passing a raw option to get the raw value`);
+          throw new SyntaxError(
+            `Failed to parse value of ${key}, try passing a raw option to get the raw value`
+          );
         }
 
         if (value === null || value === undefined) {
@@ -41,7 +43,7 @@ class Client {
         }
 
         return value;
-      })
+      });
   }
 
   /**
@@ -50,9 +52,13 @@ class Client {
    * @param {any} value Value
    */
   async set(key, value) {
-    const strValue = JSON.stringify(value)
+    const strValue = JSON.stringify(value);
 
-    await fetch(this.key, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: key + "=" + strValue });
+    await fetch(this.key, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: key + "=" + strValue,
+    });
     return this;
   }
 
@@ -69,9 +75,17 @@ class Client {
    * List key starting with a prefix or list all.
    * @param {String} prefix Filter keys starting with prefix.
    */
-  async list(prefix="") {
-    return await fetch(this.key + "?prefix=" + prefix)
-      .then(e => e.text());
+  async list(prefix = "") {
+    return await fetch(
+      this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`
+    )
+      .then((r) => r.text())
+      .then((t) => {
+        if (t.length === 0) {
+          return [];
+        }
+        return t.split("\n").map(decodeURIComponent);
+      });
   }
 
   // Dynamic Functions
@@ -79,12 +93,9 @@ class Client {
    * Clears the database.
    */
   async empty() {
-    let data = await this.list();
-    data = data.split("\n");
-    
-    const promises = []
-    for (const el of data) {
-      promises.push(this.delete(el));
+    const promises = [];
+    for (const key of await this.list()) {
+      promises.push(this.delete(key));
     }
 
     await Promise.all(promises);
@@ -97,10 +108,7 @@ class Client {
    */
   async getAll() {
     let output = {};
-    let data = await this.list();
-    data = data.split("\n");
-
-    for (const key of data) {
+    for (const key of await this.list()) {
       let value = await this.get(key);
       output[key] = value;
     }
