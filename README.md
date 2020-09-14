@@ -2,66 +2,98 @@
 
 [![Run on Repl.it](https://repl.it/badge/github/replit/database-node)](https://repl.it/github/replit/database-node)
 
-# Repl.it Database client
-Repl.it Database client is a simple way to use Repl.it Database in your Node.js repls. It uses `await/async`.
+# Repl.it Database Client
 
-## Get started
+Repl.it Database Client is a simple way to use repl.it database in your Node.js repls. It's optimized for asynchronous and uses `async/await`.
+
+## Getting started
+
+Just import the module as usual and create an Client instance to access your repl.it database.
+
 ```js
 const Client = require("@replit/database");
-const client = new Client();
-await Client.set("key", "value");
-let key = await Client.get("key");
-console.log(key);
+const db = new Client();
+await db.set("key", "awesome-value");
+let value = await db.get("key");
+console.log(value);
 ```
 
 ## Docs
-### `class Client(String key?)`
-The key is the optional custom URL.
 
-**Native Functions**
+Initial repl.it database implementation containy only one class and supports `set, get, list, and delete` methods. These are referred to as **Native Methods**. In addition to these, some extra methods are added in order to improve ease of use and functionality. These functions are referred to as **Dynamic Methods** and they are `getAll, setAll, deleteMultiple, and empty`.
 
-These functions are specified in the repl.it DB.
+### Class structure
 
-> `get(String key, Object options?)`
+Repl.it Database Client contains only one class with the signature of `class Client(String key?)`. The key is an optional value and it points to a custom repl.it database URL.
 
-Gets a key. Returns Promise.
+### Native methods
+
+These methods are specified in the repl.it database implementation. `set, get, list, and delete`
+
+**Set a value**
+
+`obj.set(String key, Any value)` stores a value with the given key and returns the client instance.
+
 ```js
-Client.get("key", { raw: false }).then(console.log);
+await db.set("key", "value");
 ```
 
-> `set(String key, Any value)`
+or
 
-Sets a key to value. Returns Client. 
+```
+db.set("key", "value").catch( err => {
+  console.log("Something, somewhere went terribly wrong.");
+});
+```
 
-> `delete(String key)`
+**Get a value**
 
-Deletes a key. Returns Client.
+`obj.get(String key, Object options?)` returns a promise associated with the given key.
 
-> `list(String? prefix)`
+```js
+let value = await db.get("key");
+```
 
-Lists all of the keys, or all of the keys starting with `prefix` if specifed.
+or
 
-**Dynamic Functions**
+```js
+db.get("key").then( value => {
+  console.log("Here's my valude folks:", value);
+});
+```
 
-These functions have been added by me.
+**List keys**
 
-> `empty()`
+`obj.list(String? prefix)` returns all keys matching the optional `prefix` value. Returns all keys if no prefix is specified.
 
-Clears the database. Returns Client
+**Delete a key-value pair**
 
-> `getAll()`
+`obj.delete(String key)` deletes the key and its associated value from database. Returns the client instance.
 
-Get all key/value pairs and return as an object.
 
-> `setAll(Object obj)`
+### Dynamic methods
 
-Sets the entire database through a key/value object. Returns Client
+These methods written by the repo owner and provide additional functionality to improve ease of use. `getAll, setAll, deleteMultiple, and empty`.
 
-> `deleteMultiple(...String args)`
+**Get all key-value pairs**
 
-Deletes multiple keys. Returns client.
+`obj.getAll()` returns all key-value pairs as an object.
 
-## Tests
+**Set all key-value pairs**
+
+`obj.setAll(Object obj)` seet the entire database through a key-value object and returns the client instance.
+
+**Delete multiple key-value pairs**
+
+`obj.deleteMultiple(...String args)` deletes the given keys and their associated values. Returns the client instance.
+
+**Empty the database**
+
+`obj.empty()` clears the database and returns the client instance.
+
+
+## Testing
+
 ```sh
 npm i
 npm run test
