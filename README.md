@@ -9,8 +9,8 @@ Repl.it Database client is a simple way to use Repl.it Database in your Node.js 
 ```js
 const Client = require("@replit/database");
 const client = new Client();
-await Client.set("key", "value");
-let key = await Client.get("key");
+await client.set("key", "value");
+let key = await client.get("key");
 console.log(key);
 ```
 
@@ -26,7 +26,7 @@ These functions are specified in the repl.it DB.
 
 Gets a key. Returns Promise.
 ```js
-Client.get("key", { raw: false }).then(console.log);
+client.get("key", { raw: false }).then(console.log);
 ```
 
 > `set(String key, Any value)`
