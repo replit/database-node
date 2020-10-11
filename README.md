@@ -62,6 +62,14 @@ Sets the entire database through a key/value object. Returns Client
 Deletes multiple keys. Returns client.
 
 ## Tests
+
+To test, create a `.env` file with the following value:
+```
+REPLIT_DB_URL=https://kv.repl.it/v0/yourtokenhere
+```
+
+Then, run:
+
 ```sh
 npm i
 npm run test

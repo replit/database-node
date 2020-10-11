@@ -1,17 +1,22 @@
 const fetch = require("node-fetch");
 const Client = require("./index");
+require('dotenv').config();
 
 let client;
 
 beforeAll(async () => {
-  const pass = process.env.PASSWORD;
-  const resp = await fetch("https://database-test-jwt.kochman.repl.co", {
-    headers: {
-      Authorization: "Basic " + btoa("test:" + pass),
-    },
-  });
-  const url = await resp.text();
-  client = new Client(url);
+  if(process.env.REPLIT_DB_URL) {
+    client = new Client(process.env.REPLIT_DB_URL);
+  } else {
+    const pass = process.env.PASSWORD;
+    const resp = await fetch("https://database-test-jwt.kochman.repl.co", {
+      headers: {
+        Authorization: "Basic " + btoa("test:" + pass),
+      },
+    });
+    const url = await resp.text();
+    client = new Client(url);
+  }
   await client.empty();
 });
 
