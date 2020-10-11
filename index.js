@@ -1,5 +1,4 @@
 const fetch = require("node-fetch");
-
 class Client {
   /**
    * Initiates Class.
@@ -17,33 +16,21 @@ class Client {
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
   async get(key, options) {
-    return await fetch(this.key + "/" + key)
-      .then((e) => e.text())
-      .then((strValue) => {
-        if (options && options.raw) {
-          return strValue;
-        }
+    let value = await fetch(`${this.key}/${key}`).then((e) => e.text());
+    if (options && options.raw) {
+      return value;
+    }
 
-        if (!strValue) {
-          return null;
-        }
+    try {
+      // Try to parse as JSON, if it fails, we throw
+      value = JSON.parse(value);
+    } catch (_err) {
+      throw new SyntaxError(
+        `Failed to parse value of ${key}, try passing a raw option to get the raw value`
+      );
+    }
 
-        let value = strValue;
-        try {
-          // Try to parse as JSON, if it fails, we throw
-          value = JSON.parse(strValue);
-        } catch (_err) {
-          throw new SyntaxError(
-            `Failed to parse value of ${key}, try passing a raw option to get the raw value`
-          );
-        }
-
-        if (value === null || value === undefined) {
-          return null;
-        }
-
-        return value;
-      });
+    return (value === null || value === undefined) ? null : value;
   }
 
   /**
@@ -53,11 +40,10 @@ class Client {
    */
   async set(key, value) {
     const strValue = JSON.stringify(value);
-
     await fetch(this.key, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: key + "=" + strValue,
+      body: `${key}=${strValue}`,
     });
     return this;
   }
@@ -67,7 +53,7 @@ class Client {
    * @param {String} key Key
    */
   async delete(key) {
-    await fetch(this.key + "/" + key, { method: "DELETE" });
+    await fetch(`${this.key}/${key}`, { method: "DELETE" });
     return this;
   }
 
@@ -76,16 +62,13 @@ class Client {
    * @param {String} prefix Filter keys starting with prefix.
    */
   async list(prefix = "") {
-    return await fetch(
-      this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`
-    )
-      .then((r) => r.text())
-      .then((t) => {
-        if (t.length === 0) {
-          return [];
-        }
-        return t.split("\n").map(decodeURIComponent);
-      });
+    const list = await fetch(
+      `${this.key}?encode=true&prefix=${encodeURIComponent(prefix)}`
+    ).then((r) => r.text());
+    if (list.length === 0) {
+      return [];
+    }
+    return list.split("\n").map(decodeURIComponent);
   }
 
   // Dynamic Functions
@@ -93,10 +76,8 @@ class Client {
    * Clears the database.
    */
   async empty() {
-    const promises = [];
-    for (const key of await this.list()) {
-      promises.push(this.delete(key));
-    }
+    const promises = (await this.list())
+      .map(key => this.delete(key));
 
     await Promise.all(promises);
 
@@ -132,11 +113,8 @@ class Client {
    * @param {Array<string>} args Keys
    */
   async deleteMultiple(...args) {
-    const promises = [];
-
-    for (const arg of args) {
-      promises.push(this.delete(arg));
-    }
+    const promises = args
+      .map(key => this.delete(key));
 
     await Promise.all(promises);
 
