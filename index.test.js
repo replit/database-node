@@ -4,14 +4,16 @@ const Client = require("./index");
 let client;
 
 beforeAll(async () => {
-  const pass = process.env.PASSWORD;
+  /* const pass = process.env.PASSWORD;
   const resp = await fetch("https://database-test-jwt.kochman.repl.co", {
     headers: {
       Authorization: "Basic " + btoa("test:" + pass),
     },
   });
   const url = await resp.text();
-  client = new Client(url);
+  client = new Client(url); */
+  client = new Client();
+
   await client.empty();
 });
 
@@ -67,9 +69,27 @@ test("delete a value", async () => {
 
 test("list keys with newline", async () => {
   await client.setAll({
-    "key\nwit": "first",
-    keywidout: "second",
+    "key\nwith": "first",
+    keywithout: "second",
   });
 
-  expect(await client.list()).toEqual(["keywidout", "key\nwit"]);
+  expect(await client.list()).toEqual(["key\nwith", "keywithout"]);
 });
+
+test("list keys as object", async () => {
+  await client.setAll({
+    key1: 1,
+    key2: 2
+  })
+
+  expect(await client.listAllAsObject()).toEqual([
+    {
+      key: "key1",
+      value: 1
+    },
+    {
+      key: "key2",
+      value: 2
+    }
+  ]);
+})
