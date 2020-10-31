@@ -15,6 +15,7 @@ class Client {
    * Gets a key
    * @param {String} key Key
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
+   * @returns {Promise<any>}
    */
   async get(key, options) {
     return await fetch(this.key + "/" + key)
@@ -50,6 +51,7 @@ class Client {
    * Sets a key
    * @param {String} key Key
    * @param {any} value Value
+   * @returns {Promise<Client>}
    */
   async set(key, value) {
     const strValue = JSON.stringify(value);
@@ -59,12 +61,14 @@ class Client {
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: key + "=" + strValue,
     });
+
     return this;
   }
 
   /**
    * Deletes a key
    * @param {String} key Key
+   * @returns {Promise<Client>}
    */
   async delete(key) {
     await fetch(this.key + "/" + key, { method: "DELETE" });
@@ -74,6 +78,7 @@ class Client {
   /**
    * List key starting with a prefix or list all.
    * @param {String} prefix Filter keys starting with prefix.
+   * @returns {Promise<String[]>}
    */
   async list(prefix = "") {
     return await fetch(
@@ -91,6 +96,7 @@ class Client {
   // Dynamic Functions
   /**
    * Clears the database.
+   * @returns {Promise<Client>}
    */
   async empty() {
     const promises = [];
@@ -105,6 +111,7 @@ class Client {
 
   /**
    * Get all key/value pairs and return as an object
+   * @returns {Promise<any>}
    */
   async getAll() {
     let output = {};
@@ -118,18 +125,21 @@ class Client {
   /**
    * Sets the entire database through an object.
    * @param {Object} obj The object.
+   * @returns {Promise<Client>}
    */
   async setAll(obj) {
     for (const key in obj) {
       let val = obj[key];
       await this.set(key, val);
     }
+
     return this;
   }
 
   /**
    * Delete multiple entries by keys
    * @param {Array<string>} args Keys
+   * @returns {Promise<Client>}
    */
   async deleteMultiple(...args) {
     const promises = [];
@@ -141,6 +151,20 @@ class Client {
     await Promise.all(promises);
 
     return this;
+  }
+  
+  /**
+   * List keys by their keyName and value.
+   * @returns {Promise<{ key: String, value: any }>}
+   */
+  async listAllAsObject() {
+    const output = [];
+
+    for (const key of await this.list()) {
+      output.push({ key, value: await this.get(key) })
+    }
+
+    return output;
   }
 }
 
