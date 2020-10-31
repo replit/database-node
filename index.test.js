@@ -5,6 +5,7 @@ let client;
 
 beforeAll(async () => {
   const pass = process.env.PASSWORD;
+  
   if (pass) {
     const resp = await fetch("https://database-test-jwt.kochman.repl.co", {
       headers: {
