@@ -57,7 +57,7 @@ class Client {
     await fetch(this.key, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: key + "=" + strValue,
+      body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
     });
     return this;
   }
