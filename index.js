@@ -6,8 +6,7 @@ class Client {
    * @param {String} key Custom database URL
    */
   constructor(key) {
-    if (key) this.key = key;
-    else this.key = process.env.REPLIT_DB_URL;
+    this.key = key || process.env.REPLIT_DB_URL;
   }
 
   // Native Functions
