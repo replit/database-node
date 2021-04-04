@@ -7,7 +7,8 @@ class Client {
    */
   constructor(key) {
     if (key) this.key = key;
-    else this.key = process.env.REPLIT_DB_URL;
+    else if (process.env.REPLIT_DB_URL) this.key = process.env.REPLIT_DB_URL;
+    else throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
   }
 
   // Native Functions
