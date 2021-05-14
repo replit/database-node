@@ -1,4 +1,4 @@
-export class Client {
+export default class Client {
   constructor(key?: string);
 
   // Native
