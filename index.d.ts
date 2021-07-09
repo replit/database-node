@@ -15,5 +15,5 @@ export class Client {
 }
 
 declare module "@replit/database" {
- 	export = Client
+  export = Client
 }
