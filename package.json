@@ -1,23 +1,28 @@
 {
-  "name": "@replit/database",
-  "version": "2.0.1",
-  "description": "Client for Repl.it Database",
+  "name": "better-replit-db",
+  "version": "1.0.0",
+  "description": "Client for Replit Database with built in memory caching.",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "cd tests && jest --verbose --silent=false"
   },
   "contributors": [
     {
       "name": "Junhao Zhang",
       "url": "https://github.com/mrlapizgithub/repl.it-db"
+    },
+    {
+      "name": "Replit",
+      "url": "https://github.com/replit/database-node"
     }
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/replit/database-node.git"
+    "url": "https://github.com/pieromqwerty/better-replit-db.git"
   },
   "dependencies": {
+    "@replit/database": "^2.0.1",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
