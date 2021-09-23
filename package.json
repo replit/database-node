@@ -22,7 +22,6 @@
     "url": "https://github.com/pieromqwerty/better-replit-db.git"
   },
   "dependencies": {
-    "@replit/database": "^2.0.1",
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
