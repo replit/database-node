@@ -26,7 +26,7 @@ These functions are specified in the repl.it DB.
 
 Gets a key. Returns Promise.
 ```js
-Client.get("key", { raw: false }).then(console.log);
+client.get("key", { raw: false }).then(console.log);
 ```
 
 > `set(String key, Any value)`
