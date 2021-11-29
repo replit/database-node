@@ -17,7 +17,7 @@ class Client {
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
   async get(key, options) {
-    return await fetch(this.key + "/" + key)
+    return await fetch(`${this.key}/${key}`)
       .then((e) => e.text())
       .then((strValue) => {
         if (options && options.raw) {
@@ -57,7 +57,7 @@ class Client {
     await fetch(this.key, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
+      body: `${encodeURIComponent(key)}=${encodeURIComponent(strValue)}`,
     });
     return this;
   }
@@ -67,7 +67,7 @@ class Client {
    * @param {String} key Key
    */
   async delete(key) {
-    await fetch(this.key + "/" + key, { method: "DELETE" });
+    await fetch(`${this.key}/${key}`, { method: "DELETE" });
     return this;
   }
 
