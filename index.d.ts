@@ -1,4 +1,4 @@
-export class Client {
+class Client {
   constructor(key?: string);
 
   // Native
@@ -13,3 +13,5 @@ export class Client {
   public setAll(obj: Record<any, any>): Client;
   public deleteMultiple(...args: string[]): Client;
 }
+
+export default Client
