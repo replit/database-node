@@ -6,8 +6,7 @@ class Client {
    * @param {String} key Custom database URL
    */
   constructor(key) {
-    if (key) this.key = key;
-    else this.key = process.env.REPLIT_DB_URL;
+    this.key = key || process.env.REPLIT_DB_URL;
   }
 
   // Native Functions
@@ -17,10 +16,10 @@ class Client {
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
   async get(key, options) {
-    return await fetch(this.key + "/" + key)
+    return fetch(this.key + "/" + key)
       .then((e) => e.text())
       .then((strValue) => {
-        if (options && options.raw) {
+        if (options?.raw) {
           return strValue;
         }
 
@@ -38,7 +37,7 @@ class Client {
           );
         }
 
-        if (value === null || value === undefined) {
+        if (value === undefined) {
           return null;
         }
 
@@ -57,7 +56,7 @@ class Client {
     await fetch(this.key, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
+      body: `${encodeURIComponent(key)}=${encodeURIComponent(strValue)}`,
     });
     return this;
   }
@@ -67,7 +66,7 @@ class Client {
    * @param {String} key Key
    */
   async delete(key) {
-    await fetch(this.key + "/" + key, { method: "DELETE" });
+    await fetch(`${this.key}/${key}`, { method: "DELETE" });
     return this;
   }
 
@@ -76,8 +75,8 @@ class Client {
    * @param {String} prefix Filter keys starting with prefix.
    */
   async list(prefix = "") {
-    return await fetch(
-      this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`
+    return fetch(
+      `${this.key}?encode=true&prefix=${encodeURIComponent(prefix)}`
     )
       .then((r) => r.text())
       .then((t) => {
@@ -93,12 +92,9 @@ class Client {
    * Clears the database.
    */
   async empty() {
-    const promises = [];
     for (const key of await this.list()) {
-      promises.push(this.delete(key));
+      await this.delete(key);
     }
-
-    await Promise.all(promises);
 
     return this;
   }
@@ -132,13 +128,10 @@ class Client {
    * @param {Array<string>} args Keys
    */
   async deleteMultiple(...args) {
-    const promises = [];
 
     for (const arg of args) {
-      promises.push(this.delete(arg));
+      await this.delete(arg);
     }
-
-    await Promise.all(promises);
 
     return this;
   }
