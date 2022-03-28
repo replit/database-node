@@ -2,67 +2,115 @@
 
 [![Run on Repl.it](https://repl.it/badge/github/replit/database-node)](https://repl.it/github/replit/database-node)
 
-# Repl.it Database client
-Repl.it Database client is a simple way to use Repl.it Database in your Node.js repls. It uses `await/async`.
+# Replit Database client
+Replit Database client is a simple and easy way to use Replit Database in your node repls. 
+It uses promises to make for easy use.
 
 ## Get started
 ```js
+// Import the client
 const Client = require("@replit/database");
-const client = new Client();
-await Client.set("key", "value");
-let key = await Client.get("key");
+// Create a client
+const db = new Client();
+// Set a item in the database
+await db.set("key", "value");
+// Get the same item that we set
+let key = await db.get("key");
+// Print the value
 console.log(key);
 ```
 
-## Docs
-### `class Client(String key?)`
-The key is the optional custom URL.
+## Functions
 
-**Native Functions**
-
-These functions are specified in the repl.it DB.
-
-> `get(String key, Object options?)`
-
-Gets a key. Returns Promise.
+### Creating a client
+You can specify the url of the database.
+If you don't specify the url, it will use a url from the env.
 ```js
-Client.get("key", { raw: false }).then(console.log);
+// DB with URL
+const db = new Client("https://database.example.example");
+// DB without URL
+const db = new Client();
 ```
 
-> `set(String key, Any value)`
+### Geting an item
+When getting an item, by default, it tries to parse the value as a JSON.
+To disable this, you can pass `true` as the second argument.
+```js
+// Get the item
+let key = await db.get("key");
+// Get the item as a string
+let key = await db.get("key", true);
+```
 
-Sets a key to value. Returns Client. 
+### Setting an item
+When setting an item, by default, it stores it as a JSON.
+To disable this, you can pass `true` as the third argument.
+```js
+// Set the item
+await db.set("key", "value");
+// Set the item as a string
+await db.set("key", "value", true);
+```
 
-> `delete(String key)`
+### Deleting an item
+There are no settings for deleting an item.
+```js
+// Delete the item
+await db.delete("key");
+```
 
-Deletes a key. Returns Client.
+### Listing items
+If you want to list all the items in the db, dont pass any arguments.
+You can also specify a prefix to list only the items that starts with that prefix.
+```js
+// List all the items
+let items = await db.list();
+// List all the items that starts with "key"
+let items = await db.list("key");
+```
 
-> `list(String? prefix)`
+### Emptying the database
+There is no settings for emptying the database.
+```js
+// Empty the database
+await db.empty();
+```
 
-Lists all of the keys, or all of the keys starting with `prefix` if specifed.
+### Get all the items in the DB
+When getting all the items, by default, it tries to parse the value as a JSON.
+To disable this, you can pass `true` as the first argument.
+```js
+// Get all the items
+let items = await db.getAll();
+// Get all the items as a string
+let items = await db.getAll(true);
+```
 
-**Dynamic Functions**
+### Setting all the items in the DB
+When setting all the items, by default, it stores them as a JSON.
+To disable this, you can pass `true` as the second argument.
+```js
+// Set all the items
+await db.setAll({
+	key: "value",
+	key2: "value2"
+});
+// Set all the items as a string
+await db.setAll({
+	key: "value",
+	key2: "value2"
+}, true);
+```
 
-These functions have been added by me.
-
-> `empty()`
-
-Clears the database. Returns Client
-
-> `getAll()`
-
-Get all key/value pairs and return as an object.
-
-> `setAll(Object obj)`
-
-Sets the entire database through a key/value object. Returns Client
-
-> `deleteMultiple(...String args)`
-
-Deletes multiple keys. Returns client.
+### Deleting multiple items
+There are no settings for deleting multiple items.
+```js
+// Delete multiple items
+await db.deleteAll("key", "key2");
+```
 
 ## Tests
 ```sh
-npm i
-npm run test
+yarn install
+yarn test
 ```

@@ -1,26 +1,21 @@
 {
-  "name": "@replit/database",
-  "version": "2.0.1",
-  "description": "Client for Repl.it Database",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest"
-  },
-  "contributors": [
-    {
-      "name": "Junhao Zhang",
-      "url": "https://github.com/mrlapizgithub/repl.it-db"
-    }
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/replit/database-node.git"
-  },
-  "dependencies": {
-    "node-fetch": "^2.6.0"
-  },
-  "devDependencies": {
-    "jest": "^26.1.0"
-  }
+	"name": "replit-db",
+	"version": "1.0.0",
+	"description": "A client DB for replit's database.",
+	"main": "dist/lib/index.js",
+	"author": "josh-codes",
+	"license": "LGPL-3.0",
+	"private": false,
+	"devDependencies": {
+		"@types/node": "^17.0.23",
+		"typescript": "^4.6.3",
+		"ts-node": "^10.7.0"
+	},
+	"dependencies": {
+		"axios": "^0.26.1"
+	},
+	"scripts": {
+		"test": "ts-node src/test.ts",
+		"build": "tsc"
+	}
 }
