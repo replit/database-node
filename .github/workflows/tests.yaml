@@ -21,9 +21,9 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-        name: Install dependencies
-        run: yarn --frozen-lockfile
-        run: yarn run buildxw
+      - name: Install dependencies
+        run: yarn install
+      - name: Run tests
         run: yarn run test:ci
         env:
           DB_TOKEN: ${{secrets.DB_TOKEN}}
