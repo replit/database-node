@@ -1,0 +1,5 @@
+run = ["yarn", "start"]
+
+language = "nix"
+
+entrypoint = "src/index.ts"

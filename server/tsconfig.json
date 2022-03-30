@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"strict": true,
+		"outDir": "dist",
+		"module": "commonjs",
+		"target": "ES2017",
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true
+	},
+	"include": [
+		"src/**/*.ts"
+	]
+}
