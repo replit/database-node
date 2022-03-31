@@ -1,0 +1,5 @@
+run = ["yarn", "test:ci"]
+
+language = "nodejs"
+
+entrypoint = "src/index.ts"

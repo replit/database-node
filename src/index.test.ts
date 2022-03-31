@@ -8,6 +8,11 @@ jest.setTimeout(30000);
 beforeAll(async () => {
 	// Load environment variables from .env file
 	config();
+	// If REPLIT_DB_URL is set then create a new client with it
+	if (process.env.REPLIT_DB_URL) {
+		db = new Client();
+		return;
+	}
 	// Get the details
 	const details = {
 		host: process.env.DB_HOST || '',

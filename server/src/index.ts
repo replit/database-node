@@ -39,7 +39,6 @@ app.get('/db/:token/:key', async (req: Request, res: Response) => {
 	const request = await axios.get(
 		join(dbUrl, encodeURIComponent(req.params.key || ''))
 	).catch((err) => {
-		console.log(err);
 		// If the request returns 404, return 404
 		if (err.response && err.response.status === 404) return 404;
 		// Otherwise return 500

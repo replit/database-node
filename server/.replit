@@ -1,4 +1,4 @@
-run = ["yarn", "start"]
+run = ["yarn", "dev"]
 
 language = "nix"
 
