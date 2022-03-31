@@ -1,3 +1,5 @@
+/** @format */
+
 import { URL } from 'url';
 
 interface QueryParams {
@@ -7,7 +9,10 @@ interface QueryParams {
 /**
  * @description Genreates a URL encoded string from an object
  */
-export const generateUrl = (baseURI: string, params: QueryParams): string | undefined => {
+export const generateUrl = (
+	baseURI: string,
+	params: QueryParams
+): string | undefined => {
 	// We put it in a function so we dont put everything in a try catch block
 	const getURL = () => {
 		try {
@@ -28,35 +33,39 @@ export const generateUrl = (baseURI: string, params: QueryParams): string | unde
 		return;
 	}
 
-	let urlWithParams = baseURL.protocol+'//';
+	let urlWithParams = baseURL.protocol + '//';
 
 	if (baseURL.username !== '') {
-		urlWithParams = urlWithParams+baseURL.username;
+		urlWithParams = urlWithParams + baseURL.username;
 	}
 
 	if (baseURL.password !== '') {
-		urlWithParams = urlWithParams+':'+baseURL.password;
+		urlWithParams = urlWithParams + ':' + baseURL.password;
 	}
 
 	if (baseURL.username !== '' || baseURL.password !== '') {
-		urlWithParams = urlWithParams+'@';
+		urlWithParams = urlWithParams + '@';
 	}
 
-	urlWithParams = urlWithParams+baseURL.host+baseURL.pathname;
-	
-	const queryParams = Object.keys(params).map(key => {
-		const value = params[key];
+	urlWithParams = urlWithParams + baseURL.host + baseURL.pathname;
 
-		if (value) {
-			return encodeURIComponent(key)+'='+encodeURIComponent(value);
-		}
+	const queryParams = Object.keys(params)
+		.map((key) => {
+			const value = params[key];
 
-		return encodeURIComponent(key);
-	}).join('&');
+			if (value) {
+				return (
+					encodeURIComponent(key) + '=' + encodeURIComponent(value)
+				);
+			}
+
+			return encodeURIComponent(key);
+		})
+		.join('&');
 
 	if (queryParams !== '') {
-		urlWithParams = urlWithParams+'?'+queryParams;
+		urlWithParams = urlWithParams + '?' + queryParams;
 	}
 
-	return urlWithParams+baseURL.hash;
+	return urlWithParams + baseURL.hash;
 };

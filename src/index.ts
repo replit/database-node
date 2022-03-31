@@ -1,3 +1,5 @@
+/** @format */
+
 import axios from 'axios';
 import { generateUrl } from './generateUrl';
 import { config } from 'dotenv';
@@ -32,7 +34,9 @@ export class Client {
 		const dbUrl = url || process.env.REPLIT_DB_URL;
 		// Make sure the url is set
 		if (!dbUrl) {
-			throw new Error('URL was not found in env and or undefined url passed.');
+			throw new Error(
+				'URL was not found in env and or undefined url passed.'
+			);
 		}
 		// Set the url
 		this.url = dbUrl;
@@ -44,24 +48,31 @@ export class Client {
 	 * @param {boolean | undefined} raw Defaults to false, if true will return the raw value
 	 * @returns {Promise<string | object | number | undefined>} The value or undefined
 	 */
-	public async get(key: string, raw: boolean | undefined = false): Promise<string | object | number | undefined> {
-		const request = await axios.get(
-			join(this.url, encodeURIComponent(key))
-		).catch((error) => {
-			if (error.response && error.response.status === 404) {
-				return {
-					data: undefined
-				};
-			}
-			throw error;
-		});
+	public async get(
+		key: string,
+		raw: boolean | undefined = false
+	): Promise<string | object | number | undefined> {
+		const request = await axios
+			.get(join(this.url, encodeURIComponent(key)))
+			.catch((error) => {
+				if (error.response && error.response.status === 404) {
+					return {
+						data: undefined
+					};
+				}
+				throw error;
+			});
 		// If the raw flag is set return the raw value
 		if (raw) {
-			return request.data !== undefined ? request.data.toString() : undefined;
+			return request.data !== undefined
+				? request.data.toString()
+				: undefined;
 		}
 		// Try to parse the value
 		try {
-			return request.data !== undefined ? JSON.parse(request.data || '') : undefined;
+			return request.data !== undefined
+				? JSON.parse(request.data || '')
+				: undefined;
 		} catch {
 			return request.data !== undefined ? request.data : undefined;
 		}
@@ -74,13 +85,19 @@ export class Client {
 	 * @param {boolean} raw Defaults to false, if true will return the raw value
 	 * @returns {Promise<Client>} The client
 	 */
-	public async set(key: string, value: object | string | number | undefined, raw = false): Promise<Client> {
-		const data = raw ? (value || 'undefined').toString() : JSON.stringify(value);
+	public async set(
+		key: string,
+		value: object | string | number | undefined,
+		raw = false
+	): Promise<Client> {
+		const data = raw
+			? (value || 'undefined').toString()
+			: JSON.stringify(value);
 		// Make the request
 		await axios.post(
 			this.url,
 			`${encodeURIComponent(key)}=${encodeURIComponent(data)}`,
-			{headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+			{ headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
 		);
 		// Return the client
 		return this;
@@ -93,7 +110,9 @@ export class Client {
 	 */
 	public async delete(key: string): Promise<Client> {
 		// Make the request
-		const requestPromise = axios.delete(join(this.url, encodeURIComponent(key)));
+		const requestPromise = axios.delete(
+			join(this.url, encodeURIComponent(key))
+		);
 		// Wait for the request to finish
 		await requestPromise.catch((error) => {
 			if (error.response && error.response.status === 404) {
@@ -112,17 +131,21 @@ export class Client {
 	 */
 	public async list(prefix = ''): Promise<string[]> {
 		// Make the request
-		const request = await axios.get(generateUrl(this.url, {
-			prefix: prefix,
-			encode: 'true'
-		}) || '').catch((error) => {
-			if (error.response && error.response.status === 404) {
-				return {
-					data: []
-				};
-			}
-			throw error;
-		});
+		const request = await axios
+			.get(
+				generateUrl(this.url, {
+					prefix: prefix,
+					encode: 'true'
+				}) || ''
+			)
+			.catch((error) => {
+				if (error.response && error.response.status === 404) {
+					return {
+						data: []
+					};
+				}
+				throw error;
+			});
 		// Return the keys
 		if (request.data.toString().length === 0) {
 			return [];
@@ -151,11 +174,13 @@ export class Client {
 	 * @param {boolean} raw Defaults to false, if true will return the raw value
 	 * @returns {Promise<{[key: string]: object | string | number | undefined}>} The key and values
 	 */
-	public async getAll(raw = false): Promise<{[key: string]: object | string | number | undefined}> {
+	public async getAll(
+		raw = false
+	): Promise<{ [key: string]: object | string | number | undefined }> {
 		// Get the keys
 		const keys = await this.list();
 		// Create an object
-		const obj: {[key: string]: object | string | number | undefined} = {};
+		const obj: { [key: string]: object | string | number | undefined } = {};
 		// Crate a promise for each key
 		const promises = keys.map((key) => {
 			return (async () => {
@@ -179,20 +204,24 @@ export class Client {
 	 * @param {boolean} raw Defaults to false, if true will return the raw value
 	 * @returns {Promise<Client>} The client
 	 */
-	public async setAll(values: {[key: string]: object | string | number | undefined}, raw = false): Promise<Client> {
+	public async setAll(
+		values: { [key: string]: object | string | number | undefined },
+		raw = false
+	): Promise<Client> {
 		// Create a body
-		const body = Object.keys(values).map((key) => {
-			return `${encodeURIComponent(key)}=${encodeURIComponent(
-				raw ? (values[key] || 'undefined').toString()
-					: JSON.stringify(values[key])
-			)}`;
-		}).join('&');
+		const body = Object.keys(values)
+			.map((key) => {
+				return `${encodeURIComponent(key)}=${encodeURIComponent(
+					raw
+						? (values[key] || 'undefined').toString()
+						: JSON.stringify(values[key])
+				)}`;
+			})
+			.join('&');
 		// Make the request
-		await axios.post(
-			this.url,
-			body,
-			{headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-		);
+		await axios.post(this.url, body, {
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+		});
 		// Return the client
 		return this;
 	}
@@ -203,11 +232,13 @@ export class Client {
 	 */
 	public async deleteMultiple(...keys: string[]): Promise<Client> {
 		// Create a promise for each key
-		await Promise.all(keys.map((key) => {
-			return (async () => {
-				await this.delete(key);
-			})();
-		}));
+		await Promise.all(
+			keys.map((key) => {
+				return (async () => {
+					await this.delete(key);
+				})();
+			})
+		);
 		// Return the client
 		return this;
 	}

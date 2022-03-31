@@ -1,3 +1,5 @@
+/** @format */
+
 import { config } from 'dotenv';
 import { join, Client } from '.';
 
@@ -16,7 +18,7 @@ beforeAll(async () => {
 	// Get the details
 	const details = {
 		host: process.env.DB_HOST || '',
-		token: process.env.DB_TOKEN || '',
+		token: process.env.DB_TOKEN || ''
 	};
 	// Get the URL
 	const url = join(
@@ -33,11 +35,10 @@ beforeEach(async () => {
 	return await db?.empty();
 });
 
-
 test('Read and write a key', async () => {
 	// Write a key
 	await db?.set('a', '0');
-	// Get the 
+	// Get the
 	const value = db?.get('a', true);
 	// Make sure the value is correct
 	expect(value).resolves.toBe('0');
@@ -46,9 +47,9 @@ test('Read and write a key', async () => {
 test('Read and write many keys', async () => {
 	// Write the keys
 	await db?.setAll({
-		'a': '0',
-		'b': '1',
-		'c': '2'
+		a: '0',
+		b: '1',
+		c: '2'
 	});
 	// Read the keys
 	const values = db?.getAll(true);
@@ -72,9 +73,9 @@ test('Deleting a key', async () => {
 test('Deleting many keys', async () => {
 	// Write a key
 	await db?.setAll({
-		'a': '0',
-		'b': '1',
-		'c': '2'
+		a: '0',
+		b: '1',
+		c: '2'
 	});
 	// Delete the key
 	await db?.deleteMultiple('a', 'b', 'c');
@@ -97,13 +98,12 @@ test('Wipping the DB', async () => {
 	expect(value).resolves.toBe(undefined);
 });
 
-
 test('Listing all keys', async () => {
 	// Write the keys
 	await db?.setAll({
-		'a': '0',
-		'b': '1',
-		'c': '2'
+		a: '0',
+		b: '1',
+		c: '2'
 	});
 	// Get all the keys
 	const keys = db?.list();
@@ -114,9 +114,9 @@ test('Listing all keys', async () => {
 test('Listing keys with a prefix', async () => {
 	// Write the keys
 	await db?.setAll({
-		'prefix_a': '0',
-		'prefix_b': '1',
-		'c': '2'
+		prefix_a: '0',
+		prefix_b: '1',
+		c: '2'
 	});
 	// Get the keys
 	const keys = await db?.list('prefix_');
