@@ -4,7 +4,7 @@
 	"description": "A client DB for replit's database.",
 	"main": "dist/lib/index.js",
 	"author": "josh-codes",
-	"license": "LGPL-3.0",
+	"license": "MIT",
 	"private": false,
 	"devDependencies": {
 		"@babel/preset-env": "^7.16.11",
