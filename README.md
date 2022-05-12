@@ -1,8 +1,7 @@
-[![npm version](https://badge.fury.io/js/%40replit%2Fdatabase.svg)](https://badge.fury.io/js/%40replit%2Fdatabase)
+[![npm version](https://badge.fury.io/js/%40replit%2Fdatabase.svg)](https://badge.fury.io/js/%40replit%2Fdatabase) [![Replit DB Tests](https://github.com/josh-codes/database-node/actions/workflows/tests.yaml/badge.svg)](https://github.com/replit/database-node/actions/workflows/tests.yaml)
 
-[![Run on Replit (Main)](https://replit.com/badge/github/replit/database-node)](https://repl.it/github/replit/database-node)
+[![Run on Replit](https://replit.com/badge/github/replit/database-node)](https://repl.it/github/replit/database-node)
 
-[![Run on Replit (Testing)](https://replit.com/badge/github/josh-code/database-node)](https://repl.it/github/josh-codes/database-node)
 # Replit Database client
 
 Replit Database client is a simple and easy way to use Replit Database in your node repls.
@@ -24,8 +23,6 @@ Here are some other key changes:
 ```js
 // Import the client
 const { Client } = require("@replit/database");
-// You can also import the client as a default export
-// const Client = require("@replit/database");
 // Create a client
 const db = new Client();
 // Set a item in the database
