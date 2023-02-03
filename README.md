@@ -15,8 +15,8 @@ console.log(key);
 ```
 
 ## Docs
-### `class Client(String key?, Number ms?)`
-The parameter key is the optional custom URL.
+### `class Client(String url?, Number ms?)`
+The parameter url is the optional custom DB URL.
 The parameter ms is millseconds till cache expires.
 
 **Native Functions**

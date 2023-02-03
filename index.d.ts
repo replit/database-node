@@ -1,10 +1,10 @@
 declare class Client < T extends Record < string, unknown > = Record < string, unknown >> {
   /** 
    * Initiates Class. 
-   * @param key Custom database URL
+   * @param url Custom database URL
    * @param {Number} [ms=1000*60*5] Milliseconds till cache expires
    */
-  constructor(key ? : string, ms ? : number);
+  constructor(url ? : string, ms ? : number);
 
   // Native
   /** 

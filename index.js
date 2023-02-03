@@ -52,17 +52,18 @@ class CacheMap extends Map {
 }
 
 class Client {
+	#url;
   /**
    * Initiates Class.
-   * @param {String} key Custom database URL
+   * @param {String} url Custom database URL
    * @param {Number} [ms=1000*60*5] Milliseconds till cache expires
    */
-  constructor(key, ms = 1000 * 60 * 5) {
+  constructor(url, ms = 1000 * 60 * 5) {
     this.cache = new CacheMap(ms);
-    this.key = key ?
-      key :
+    this.#url = url ?
+      url :
       process.env.REPLIT_DB_URL;
-    if (!key) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
+    if (!this.#url) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
   }
 
   // Native Functions
@@ -85,7 +86,7 @@ class Client {
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
   async fetch(key, options) {
-    const res = await request(this.key + "/" + key);
+    const res = await request(`${this.#url}/${key}`);
     const value = await res.text();
 
     this.cache.set(key, value);
@@ -105,7 +106,7 @@ class Client {
 
     this.cache.set(key, strValue);
 
-    await request(this.key, {
+    await request(this.#url, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -121,7 +122,7 @@ class Client {
    */
   async delete(key) {
     this.cache.delete(key);
-    await request(`${this.key}/${key}`, {
+    await request(`${this.#url}/${key}`, {
       method: "DELETE"
     });
     return this;
@@ -143,7 +144,7 @@ class Client {
    */
   async fetchList(prefix = "") {
     const res = await request(
-      `${this.key}?encode=true&prefix=${encodeURIComponent(prefix)}`
+      `${this.#url}?encode=true&prefix=${encodeURIComponent(prefix)}`
     );
     const text = await res.text();
 
