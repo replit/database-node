@@ -1,0 +1,6 @@
+# For uploading to github ignoring unnecessary files
+.git
+.upm
+.config
+.cache
+node_modules
