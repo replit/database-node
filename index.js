@@ -25,11 +25,11 @@ const request = (...args) => {
 };
 
 class CacheMap extends Map {
-	constructor (ms) {
-		super();
-		this.ms = ms;
-		this.expiration = new Map();
-	}
+  constructor(ms) {
+    super();
+    this.ms = ms;
+    this.expiration = new Map();
+  }
   get(key) {
     const time = new Date().getTime(),
       expiresAt = this.expiration.get(key);
@@ -55,14 +55,14 @@ class Client {
   /**
    * Initiates Class.
    * @param {String} key Custom database URL
-	 * @param {Number} [ms=1000*60*5] Milliseconds till cache expires
+   * @param {Number} [ms=1000*60*5] Milliseconds till cache expires
    */
   constructor(key, ms = 1000 * 60 * 5) {
     this.cache = new CacheMap(ms);
     this.key = key ?
       key :
       process.env.REPLIT_DB_URL;
-		if (!key) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
+    if (!key) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
   }
 
   // Native Functions

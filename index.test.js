@@ -1,19 +1,24 @@
 const request = typeof fetch === 'undefined' ? require("./fetch.cjs") : fetch;
-const { Client } = require("./index");
+const {
+  Client
+} = require("./index");
 
 let client;
 
 beforeAll(async () => {
   const pass = process.env.PASSWORD;
-  const resp = await request("https://database-test-jwt.kochman.repl.co", {
-    headers: {
-      Authorization: "Basic " + btoa("test:" + pass),
-    },
-  });
-  const url = await resp.text();
+  if (pass) {
+    const resp = await fetch("https://database-test-jwt.kochman.repl.co", {
+      headers: {
+        Authorization: "Basic " + btoa("test:" + pass),
+      },
+    });
+    const url = await resp.text();
+    client = new Client(url);
+  } else {
+    client = new Client();
+  }
 
-  client = new Client(url);
-	
   await client.empty();
 });
 
@@ -28,7 +33,10 @@ test("create a client with a key", async () => {
 
 test("sets a value", async () => {
   expect(await client.set("key", "value")).toEqual(client);
-  expect(await client.setAll({ key: "value", second: "secondThing" })).toEqual(
+  expect(await client.setAll({
+    key: "value",
+    second: "secondThing"
+  })).toEqual(
     client
   );
 });
@@ -47,7 +55,9 @@ test("gets a value", async () => {
     key: "value",
   });
 
-  expect(await client.getAll()).toEqual({ key: "value" });
+  expect(await client.getAll()).toEqual({
+    key: "value"
+  });
 });
 
 test("delete a value", async () => {
