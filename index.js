@@ -27,8 +27,8 @@ const request = (...args) => {
 class CacheMap extends Map {
   constructor(ms) {
     super();
-    this.ms = ms;
     this.expiration = new Map();
+		this.expiration.ms = ms;
   }
   get(key) {
     const time = new Date().getTime(),
@@ -45,7 +45,7 @@ class CacheMap extends Map {
     return value;
   }
   set(key, value) {
-    const expiresAt = new Date().getTime() + this.ms;
+    const expiresAt = new Date().getTime() + this.expiration.ms;
     this.expiration.set(key, expiresAt);
     return super.set(key, value);
   }
