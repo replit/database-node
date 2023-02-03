@@ -62,6 +62,7 @@ class Client {
     this.key = key ?
       key :
       process.env.REPLIT_DB_URL;
+		if (!key) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
   }
 
   // Native Functions
@@ -127,7 +128,7 @@ class Client {
   }
 
   /**
-   * List key starting with a prefix or list all from cache or if none in cache from db.
+   * List keys starting with a prefix or list all from cache or if none in cache from db.
    * @param {String} prefix Filter keys starting with prefix.
    */
   async list(prefix = "") {
