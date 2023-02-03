@@ -1,0 +1,9 @@
+# For uploading to npm ignoring unnecessary files
+.git
+.replit
+replit.nix
+.upm
+.config
+.cache
+package-lock.json
+node_modules

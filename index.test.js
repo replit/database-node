@@ -1,17 +1,19 @@
-const fetch = require("node-fetch");
-const Client = require("./index");
+const request = typeof fetch === 'undefined' ? require("./fetch.cjs") : fetch;
+const { Client } = require("./index");
 
 let client;
 
 beforeAll(async () => {
   const pass = process.env.PASSWORD;
-  const resp = await fetch("https://database-test-jwt.kochman.repl.co", {
+  const resp = await request("https://database-test-jwt.kochman.repl.co", {
     headers: {
       Authorization: "Basic " + btoa("test:" + pass),
     },
   });
   const url = await resp.text();
+
   client = new Client(url);
+	
   await client.empty();
 });
 

@@ -1,13 +1,67 @@
-const fetch = require("node-fetch");
+const http = require('http');
+const https = require('https');
+
+const httpAgent = new http.Agent({
+  keepAlive: true
+});
+const httpsAgent = new https.Agent({
+  keepAlive: true
+});
+
+const agent = (_parsedURL) => _parsedURL.protocol == 'http:' ? httpAgent : httpsAgent;
+
+const rawFetch = typeof fetch === 'undefined' ? require("./fetch.cjs") : fetch;
+
+// Keep alive for 2x faster requests
+const request = (...args) => {
+  args[1] = typeof options !== 'object' ? {
+    agent
+  } : {
+    ...args[1],
+    agent
+  };
+
+  return rawFetch(...args);
+};
+
+class CacheMap extends Map {
+	constructor (ms) {
+		super();
+		this.ms = ms;
+		this.expiration = new Map();
+	}
+  get(key) {
+    const time = new Date().getTime(),
+      expiresAt = this.expiration.get(key);
+
+    let value = super.get(key);
+
+    if (time > expiresAt) {
+      value = null;
+      this.delete(key);
+      this.expiration.delete(key);
+    }
+
+    return value;
+  }
+  set(key, value) {
+    const expiresAt = new Date().getTime() + this.ms;
+    this.expiration.set(key, expiresAt);
+    return super.set(key, value);
+  }
+}
 
 class Client {
   /**
    * Initiates Class.
    * @param {String} key Custom database URL
+	 * @param {Number} [ms=1000*60*5] Milliseconds till cache expires
    */
-  constructor(key) {
-    if (key) this.key = key;
-    else this.key = process.env.REPLIT_DB_URL;
+  constructor(key, ms = 1000 * 60 * 5) {
+    this.cache = new CacheMap(ms);
+    this.key = key ?
+      key :
+      process.env.REPLIT_DB_URL;
   }
 
   // Native Functions
@@ -17,33 +71,27 @@ class Client {
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
   async get(key, options) {
-    return await fetch(this.key + "/" + key)
-      .then((e) => e.text())
-      .then((strValue) => {
-        if (options && options.raw) {
-          return strValue;
-        }
+    const value = this.cache.get(key) ?? await this.fetch(key);
 
-        if (!strValue) {
-          return null;
-        }
+    return options?.raw ?
+      value :
+      JSON.parse(value) ?? null;
+  }
 
-        let value = strValue;
-        try {
-          // Try to parse as JSON, if it fails, we throw
-          value = JSON.parse(strValue);
-        } catch (_err) {
-          throw new SyntaxError(
-            `Failed to parse value of ${key}, try passing a raw option to get the raw value`
-          );
-        }
+  /**
+   * Fetches a key
+   * @param {String} key Key
+   * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
+   */
+  async fetch(key, options) {
+    const res = await request(this.key + "/" + key);
+    const value = await res.text();
 
-        if (value === null || value === undefined) {
-          return null;
-        }
+    this.cache.set(key, value);
 
-        return value;
-      });
+    return options?.raw ?
+      value :
+      JSON.parse(value) ?? null;
   }
 
   /**
@@ -54,10 +102,14 @@ class Client {
   async set(key, value) {
     const strValue = JSON.stringify(value);
 
-    await fetch(this.key, {
+    this.cache.set(key, strValue);
+
+    await request(this.key, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `${encodeURIComponent(key)}=${encodeURIComponent(strValue)}`,
     });
     return this;
   }
@@ -67,25 +119,35 @@ class Client {
    * @param {String} key Key
    */
   async delete(key) {
-    await fetch(this.key + "/" + key, { method: "DELETE" });
+    this.cache.delete(key);
+    await request(`${this.key}/${key}`, {
+      method: "DELETE"
+    });
     return this;
+  }
+
+  /**
+   * List key starting with a prefix or list all from cache or if none in cache from db.
+   * @param {String} prefix Filter keys starting with prefix.
+   */
+  async list(prefix = "") {
+    let keys = [...this.cache.keys()].filter(key => key.startsWith(prefix));
+    if (!keys.length === 0) keys = await this.fetchList(prefix);
+    return keys;
   }
 
   /**
    * List key starting with a prefix or list all.
    * @param {String} prefix Filter keys starting with prefix.
    */
-  async list(prefix = "") {
-    return await fetch(
-      this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`
-    )
-      .then((r) => r.text())
-      .then((t) => {
-        if (t.length === 0) {
-          return [];
-        }
-        return t.split("\n").map(decodeURIComponent);
-      });
+  async fetchList(prefix = "") {
+    const res = await request(
+      `${this.key}?encode=true&prefix=${encodeURIComponent(prefix)}`
+    );
+    const text = await res.text();
+
+    if (text.length === 0) return [];
+    return text.split("\n").map(decodeURIComponent);
   }
 
   // Dynamic Functions
@@ -94,7 +156,7 @@ class Client {
    */
   async empty() {
     const promises = [];
-    for (const key of await this.list()) {
+    for (const key of await this.fetchList()) {
       promises.push(this.delete(key));
     }
 
@@ -104,12 +166,24 @@ class Client {
   }
 
   /**
-   * Get all key/value pairs and return as an object
+   * Get all key/value pairs and return as an object.
    */
   async getAll() {
     let output = {};
     for (const key of await this.list()) {
       let value = await this.get(key);
+      output[key] = value;
+    }
+    return output;
+  }
+
+  /**
+   * Fetch all key/value pairs and return as an object.
+   */
+  async fetchAll() {
+    let output = {};
+    for (const key of await this.fetchList()) {
+      let value = await this.fetch(key);
       output[key] = value;
     }
     return output;
@@ -144,4 +218,6 @@ class Client {
   }
 }
 
-module.exports = Client;
+module.exports = {
+  Client
+};
