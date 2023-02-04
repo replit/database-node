@@ -15,12 +15,10 @@ const rawFetch = typeof fetch === 'undefined' ? require("./fetch.cjs") : fetch;
 // Keep alive for 2x faster requests
 const request = (...args) => {
 	const options = args[1];
-	options = typeof options !== 'object' ? {
-		agent
-	} : {
-		...options,
-		agent
-	};
+	if (typeof options === 'object')
+		options.agent = agent;
+	else
+		args[1] = { agent };
 
 	return rawFetch(...args);
 };
@@ -31,7 +29,7 @@ class CacheMap extends Map {
 		this.expiration = new Map();
 		this.expiration.ms = ms;
 	}
-	
+
 	get(key) {
 		const time = new Date().getTime(),
 			expiresAt = this.expiration.get(key);
@@ -45,13 +43,13 @@ class CacheMap extends Map {
 
 		return value;
 	}
-	
+
 	set(key, value) {
 		const expiresAt = new Date().getTime() + this.expiration.ms;
 		this.expiration.set(key, expiresAt);
 		return super.set(key, value);
 	}
-	
+
 	delete(key) {
 		this.expiration.delete(key);
 		return super.delete(key);
@@ -72,7 +70,7 @@ class Client {
 			process.env.REPLIT_DB_URL;
 		if (!this.#url) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
 		this.fetchAll().then(keys => {
-			for (const key in keys) this.cache.set(key, obj[key]);
+			for (const key in keys) this.cache.set(key, keys[key]);
 		});
 	}
 
@@ -85,7 +83,7 @@ class Client {
 	async get(key, options) {
 		const value = this.cache.get(key) ?? await this.fetch(key);
 
-		return options?.raw ?
+		return options?.raw || typeof value !== "string" ?
 			value :
 			JSON.parse(value) ?? null;
 	}
@@ -101,7 +99,7 @@ class Client {
 
 		this.cache.set(key, value);
 
-		return options?.raw ?
+		return options?.raw || typeof value !== "string" ?
 			value :
 			JSON.parse(value) ?? null;
 	}
