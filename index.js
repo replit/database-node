@@ -14,10 +14,11 @@ const rawFetch = typeof fetch === 'undefined' ? require("./fetch.cjs") : fetch;
 
 // Keep alive for 2x faster requests
 const request = (...args) => {
-	args[1] = typeof options !== 'object' ? {
+	const options = args[1];
+	options = typeof options !== 'object' ? {
 		agent
 	} : {
-		...args[1],
+		...options,
 		agent
 	};
 
