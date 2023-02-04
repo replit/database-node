@@ -65,7 +65,7 @@ class Client {
 			process.env.REPLIT_DB_URL;
 		if (!this.#url) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
 		this.fetchAll().then(keys => {
-			for (const key in keys) cache.set(key, obj[key]);
+			for (const key in keys) this.cache.set(key, obj[key]);
 		});
 	}
 
