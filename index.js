@@ -31,6 +31,7 @@ class CacheMap extends Map {
 		this.expiration = new Map();
 		this.expiration.ms = ms;
 	}
+	
 	get(key) {
 		const time = new Date().getTime(),
 			expiresAt = this.expiration.get(key);
@@ -40,15 +41,20 @@ class CacheMap extends Map {
 		if (time > expiresAt) {
 			value = null;
 			this.delete(key);
-			this.expiration.delete(key);
 		}
 
 		return value;
 	}
+	
 	set(key, value) {
 		const expiresAt = new Date().getTime() + this.expiration.ms;
 		this.expiration.set(key, expiresAt);
 		return super.set(key, value);
+	}
+	
+	delete(key) {
+		this.expiration.delete(key);
+		return super.delete(key);
 	}
 }
 
