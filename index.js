@@ -100,8 +100,7 @@ class Client {
 	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
 	 */
 	async fetch(key, options) {
-		const res = await request(`${this.#url}/${key}`);
-		const value = await res.text();
+		const value = await request(`${this.#url}/${key}`).then(r => r.text());
 
 		this.cache.set(key, value);
 
@@ -157,10 +156,9 @@ class Client {
 	 * @param {String} prefix Filter keys starting with prefix.
 	 */
 	async fetchList(prefix = "") {
-		const res = await request(
+		const text = await request(
 			`${this.#url}?encode=true&prefix=${encodeURIComponent(prefix)}`
-		);
-		const text = await res.text();
+		).then(r => r.text());
 
 		if (text.length === 0) return [];
 		return text.split("\n").map(decodeURIComponent);
