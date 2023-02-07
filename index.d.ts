@@ -76,4 +76,4 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	public deleteMultiple(...args: (keyof T)[]): Promise<this>;
 }
 
-export default Client;
+export default { Client };

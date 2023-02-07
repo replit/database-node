@@ -1,7 +1,5 @@
 const request = typeof fetch === 'undefined' ? require("./fetch.cjs") : fetch;
-const {
-	Client
-} = require("./index");
+const { Client } = require("./index");
 
 let client;
 
