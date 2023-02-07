@@ -26,15 +26,18 @@ const request = (...args) => {
 class CacheMap extends Map {
 	constructor(ms) {
 		super();
+		if (ms === null) return;
 		this.expiration = new Map();
 		this.expiration.ms = ms;
 	}
 
 	get(key) {
+		let value = super.get(key);
+
+		if (!this.expiration) return value;
+		
 		const time = new Date().getTime(),
 			expiresAt = this.expiration.get(key);
-
-		let value = super.get(key);
 
 		if (time > expiresAt) {
 			value = null;
@@ -45,13 +48,15 @@ class CacheMap extends Map {
 	}
 
 	set(key, value) {
-		const expiresAt = new Date().getTime() + this.expiration.ms;
-		this.expiration.set(key, expiresAt);
+		if (this.expiration) {
+			const expiresAt = new Date().getTime() + this.expiration.ms;
+			this.expiration.set(key, expiresAt);
+		}
 		return super.set(key, value);
 	}
 
 	delete(key) {
-		this.expiration.delete(key);
+		if (this.expiration) this.expiration.delete(key);
 		return super.delete(key);
 	}
 }
@@ -61,9 +66,9 @@ class Client {
 	/**
 	 * Initiates Class.
 	 * @param {String} url Custom database URL
-	 * @param {Number} [ms=1000*60*5] Milliseconds till cache expires
+	 * @param {?number} [ms=null] Milliseconds till cache expires or null for no cache expiry
 	 */
-	constructor(url, ms = 1000 * 60 * 5) {
+	constructor(url, ms = null) {
 		this.cache = new CacheMap(ms);
 		this.#url = url ?
 			url :

@@ -2,7 +2,7 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	/** 
 	 * Initiates Class. 
 	 * @param url Custom database URL
-	 * @param {Number} [ms=1000*60*5] Milliseconds till cache expires
+	 * @param {?number} [ms=null] Milliseconds till cache expires or null for no cache expiration
 	 */
 	constructor(url?: string, ms?: number);
 
