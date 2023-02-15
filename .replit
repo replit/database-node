@@ -1,2 +1,29 @@
+compile = "yarn build"
+run = "node --enable-source-maps .build/index.js"
+entrypoint = "index.ts"
+hidden = [".build"]
+
+[packager]
 language = "nodejs"
-run = "npm run test"
+
+[packager.features]
+enabledForHosting = false
+packageSearch = true
+guessImports = true
+
+[env]
+XDG_CONFIG_HOME = "/home/runner/.config"
+
+[nix]
+channel = "stable-22_11"
+
+[gitHubImport]
+requiredFiles = [".replit", "replit.nix"]
+
+[languages]
+
+[languages.typescript]
+pattern = "**/{*.ts,*.js,*.tsx,*.jsx}"
+
+[languages.typescript.languageServer]
+start = "typescript-language-server --stdio"

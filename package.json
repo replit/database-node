@@ -4,7 +4,8 @@
   "description": "Client for Repl.it Database",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "esbuild index.ts --log-level=warning --outdir='./.build' --outbase=. --sourcemap --target='node16' --platform='node' --format='cjs'"
   },
   "contributors": [
     {
@@ -21,6 +22,6 @@
     "node-fetch": "^2.6.0"
   },
   "devDependencies": {
-    "jest": "^26.1.0"
+    "esbuild": "^0.17.8"
   }
 }
