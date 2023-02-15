@@ -1,13 +1,15 @@
-const fetch = require("node-fetch");
+import fetch from 'node-fetch';
 
-class Client {
+export default class Client {
+  key: string;
+
   /**
    * Initiates Class.
    * @param {String} key Custom database URL
    */
-  constructor(key) {
+  constructor(key: string) {
     if (key) this.key = key;
-    else this.key = process.env.REPLIT_DB_URL;
+    else this.key = process.env.REPLIT_DB_URL as string;
   }
 
   // Native Functions
@@ -16,8 +18,8 @@ class Client {
    * @param {String} key Key
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
-  async get(key, options) {
-    return await fetch(this.key + "/" + key)
+  async get(key: string, options?: { raw?: boolean }) {
+    return await fetch(this.key + '/' + key)
       .then((e) => e.text())
       .then((strValue) => {
         if (options && options.raw) {
@@ -51,13 +53,13 @@ class Client {
    * @param {String} key Key
    * @param {any} value Value
    */
-  async set(key, value) {
+  async set(key: string, value: any) {
     const strValue = JSON.stringify(value);
 
     await fetch(this.key, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: encodeURIComponent(key) + '=' + encodeURIComponent(strValue),
     });
     return this;
   }
@@ -66,8 +68,8 @@ class Client {
    * Deletes a key
    * @param {String} key Key
    */
-  async delete(key) {
-    await fetch(this.key + "/" + key, { method: "DELETE" });
+  async delete(key: string) {
+    await fetch(this.key + '/' + key, { method: 'DELETE' });
     return this;
   }
 
@@ -75,7 +77,7 @@ class Client {
    * List key starting with a prefix or list all.
    * @param {String} prefix Filter keys starting with prefix.
    */
-  async list(prefix = "") {
+  async list(prefix = '') {
     return await fetch(
       this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`
     )
@@ -84,7 +86,7 @@ class Client {
         if (t.length === 0) {
           return [];
         }
-        return t.split("\n").map(decodeURIComponent);
+        return t.split('\n').map(decodeURIComponent);
       });
   }
 
@@ -107,7 +109,7 @@ class Client {
    * Get all key/value pairs and return as an object
    */
   async getAll() {
-    let output = {};
+    let output: Record<string, any> = {};
     for (const key of await this.list()) {
       let value = await this.get(key);
       output[key] = value;
@@ -119,7 +121,7 @@ class Client {
    * Sets the entire database through an object.
    * @param {Object} obj The object.
    */
-  async setAll(obj) {
+  async setAll(obj: Record<string, any>) {
     for (const key in obj) {
       let val = obj[key];
       await this.set(key, val);
@@ -131,7 +133,7 @@ class Client {
    * Delete multiple entries by keys
    * @param {Array<string>} args Keys
    */
-  async deleteMultiple(...args) {
+  async deleteMultiple(...args: string[]) {
     const promises = [];
 
     for (const arg of args) {
@@ -144,4 +146,5 @@ class Client {
   }
 }
 
-module.exports = Client;
+// Export the class as itself
+export { Client };
