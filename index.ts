@@ -69,7 +69,7 @@ export default class Client {
    * @param {String} key Key
    */
   async delete(key: string) {
-    await fetch(this.key + '/' + key, { method: 'DELETE' });
+    await fetch(this.key + '/' + encodeURIComponent(key), { method: 'DELETE' });
     return this;
   }
 
