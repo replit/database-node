@@ -24,6 +24,19 @@ const request = (...args) => {
 	return rawFetch(...args);
 };
 
+// https://stackoverflow.com/a/52799327/15037320
+function hasJsonStructure(str) {
+    if (typeof str !== 'string') return false;
+    try {
+        const result = JSON.parse(str);
+        const type = Object.prototype.toString.call(result);
+        return type === '[object Object]' 
+            || type === '[object Array]';
+    } catch (err) {
+        return false;
+    }
+}
+
 class CacheMap extends Map {
 	constructor(ms) {
 		super();
@@ -87,12 +100,11 @@ class Client {
 	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
 	 */
 	async get(key, options) {
-		const value = this.cache.get(key) ?? await this.fetch(key);
+		let value = this.cache.get(key);
 
-		if (options?.raw) return value;
+		if (!value) return await this.fetch(key, options);
 
-		if (!value || typeof value !== "string") return value ?? null;
-
+		if (options?.raw || !hasJsonStructure(value)) return value;
 		return JSON.parse(value);
 	}
 
@@ -106,10 +118,7 @@ class Client {
 
 		this.cache.set(key, value);
 
-		if (options?.raw) return value;
-
-		if (!value || typeof value !== "string") return value ?? null;
-
+		if (options?.raw || !hasJsonStructure(value)) return value;
 		return JSON.parse(value);
 	}
 
