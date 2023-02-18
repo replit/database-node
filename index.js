@@ -74,7 +74,7 @@ class Client {
 		this.#url = url ?
 			url :
 			process.env.REPLIT_DB_URL;
-		if (!this.#url) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
+		if (!this.#url) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
 		this.fetchAll().then(keys => {
 			for (const key in keys) this.cache.set(key, keys[key]);
 		});
@@ -89,9 +89,11 @@ class Client {
 	async get(key, options) {
 		const value = this.cache.get(key) ?? await this.fetch(key);
 
-		return options?.raw || typeof value !== "string" ?
-			value :
-			JSON.parse(value) ?? null;
+		if (options?.raw) return value;
+
+		if (!value || typeof value !== "string") return value ?? null;
+
+		return JSON.parse(value);
 	}
 
 	/**
@@ -104,9 +106,11 @@ class Client {
 
 		this.cache.set(key, value);
 
-		return options?.raw || typeof value !== "string" ?
-			value :
-			JSON.parse(value) ?? null;
+		if (options?.raw) return value;
+
+		if (!value || typeof value !== "string") return value ?? null;
+
+		return JSON.parse(value);
 	}
 
 	/**
