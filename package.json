@@ -1,11 +1,12 @@
 {
   "name": "@replit/database",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "Client for Repl.it Database",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
-  },
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },	
+	
   "contributors": [
     {
       "name": "Junhao Zhang",
@@ -18,7 +19,7 @@
     "url": "https://github.com/replit/database-node.git"
   },
   "dependencies": {
-    "node-fetch": "^2.6.0"
+    "node-fetch": "latest"
   },
   "devDependencies": {
     "jest": "^26.1.0"
