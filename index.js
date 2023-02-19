@@ -25,14 +25,15 @@ const request = (...args) => {
 };
 
 // https://stackoverflow.com/a/52799327/15037320
-function hasJsonStructure(str) {
-    if (typeof str !== 'string') return false;
+const parseJson = (str) => {
+    if (typeof str !== 'string') return [false];
     try {
-        const result = JSON.parse(str);
-        const type = Object.prototype.toString.call(result);
-        return type === '[object Object]' || type === '[object Array]';
+      const result = JSON.parse(str);
+      const type = Object.prototype.toString.call(result);
+      const isJson = type === '[object Object]' || type === '[object Array]';
+			return [isJson, result];
     } catch (err) {
-        return false;
+        return [false];
     }
 }
 
@@ -98,13 +99,16 @@ class Client {
 	 * @param {String} key Key
 	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
 	 */
-	async get(key, options) {
+	async get(key, options = {}) {
 		let value = this.cache.get(key);
 
 		if (!value) return await this.fetch(key, options);
 
-		if (options?.raw || !hasJsonStructure(value)) return value;
-		return JSON.parse(value);
+	  if (options.raw) return value;
+
+    const [isJson, json] = parseJson(value);
+
+	  return !isJson ? value : json;
 	}
 
 	/**
@@ -116,9 +120,12 @@ class Client {
 		const value = await request(`${this.#url}/${key}`).then(r => r.text());
 
 		this.cache.set(key, value);
+	
+		if (options?.raw) return value;
 
-		if (options?.raw || !hasJsonStructure(value)) return value;
-		return JSON.parse(value);
+    const [isJson, json] = parseJson(value);
+		
+		return !isJson ? value ?? null : json;
 	}
 
 	/**
