@@ -26,15 +26,15 @@ const request = (...args) => {
 
 // https://stackoverflow.com/a/52799327/15037320
 const parseJson = (str) => {
-    if (typeof str !== 'string') return [false];
-    try {
-      const result = JSON.parse(str);
-      const type = Object.prototype.toString.call(result);
-      const isJson = type === '[object Object]' || type === '[object Array]';
-			return [isJson, result];
-    } catch (err) {
-        return [false];
-    }
+	if (typeof str !== 'string') return [false];
+	try {
+		const result = JSON.parse(str);
+		const type = Object.prototype.toString.call(result);
+		const isJson = type === '[object Object]' || type === '[object Array]';
+		return [isJson, result];
+	} catch (err) {
+		return [false];
+	}
 }
 
 class CacheMap extends Map {
@@ -49,7 +49,7 @@ class CacheMap extends Map {
 		let value = super.get(key);
 
 		if (!this.expiration) return value;
-		
+
 		const time = new Date().getTime(),
 			expiresAt = this.expiration.get(key);
 
@@ -104,11 +104,11 @@ class Client {
 
 		if (!value) return await this.fetch(key, options);
 
-	  if (options.raw) return value;
+		if (options.raw) return value;
 
-    const [isJson, json] = parseJson(value);
+		const [isJson, json] = parseJson(value);
 
-	  return !isJson ? value : json;
+		return !isJson ? value : json;
 	}
 
 	/**
@@ -120,11 +120,11 @@ class Client {
 		const value = await request(`${this.#url}/${key}`).then(r => r.text());
 
 		this.cache.set(key, value);
-	
+
 		if (options?.raw) return value;
 
-    const [isJson, json] = parseJson(value);
-		
+		const [isJson, json] = parseJson(value);
+
 		return !isJson ? value ?? null : json;
 	}
 
