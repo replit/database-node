@@ -27,9 +27,7 @@ const request = (...args) => {
 const parseJson = (str) => {
 	if (typeof str !== 'string') return null;
 	try {
-		const result = JSON.parse(str);
-		const type = Object.prototype.toString.call(result);
-		if (type === '[object Object]' || type === '[object Array]') return result;
+		return JSON.parse(str);
 	} catch (err) {
 		return null;
 	}
@@ -98,7 +96,7 @@ class Client {
 	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
 	 */
 	async get(key, options = {}) {
-		let value = this.cache.get(key);
+		const value = this.cache.get(key);
 
 		if (!value) return await this.fetch(key, options);
 
@@ -119,7 +117,7 @@ class Client {
 
 		if (options?.raw) return value;
 
-		return parseJson(value) ?? value ?? null;
+		return parseJson(value) ?? value;
 	}
 
 	/**
