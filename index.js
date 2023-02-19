@@ -24,16 +24,14 @@ const request = (...args) => {
 	return rawFetch(...args);
 };
 
-// https://stackoverflow.com/a/52799327/15037320
 const parseJson = (str) => {
-	if (typeof str !== 'string') return [false];
+	if (typeof str !== 'string') return null;
 	try {
 		const result = JSON.parse(str);
 		const type = Object.prototype.toString.call(result);
-		const isJson = type === '[object Object]' || type === '[object Array]';
-		return [isJson, result];
+		if (type === '[object Object]' || type === '[object Array]') return result;
 	} catch (err) {
-		return [false];
+		return null;
 	}
 }
 
@@ -106,9 +104,7 @@ class Client {
 
 		if (options.raw) return value;
 
-		const [isJson, json] = parseJson(value);
-
-		return !isJson ? value : json;
+		return parseJson(value) ?? value;
 	}
 
 	/**
@@ -123,9 +119,7 @@ class Client {
 
 		if (options?.raw) return value;
 
-		const [isJson, json] = parseJson(value);
-
-		return !isJson ? value ?? null : json;
+		return parseJson(value) ?? value ?? null;
 	}
 
 	/**
