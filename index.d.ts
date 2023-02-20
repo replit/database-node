@@ -9,8 +9,9 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	// Native
 	/** 
 	 * Gets a key 
-	 * @param key Key
-	 * @param [options.raw =false] Makes it so that we return the raw string value. Default is false. 
+	 * @param {String} key Key
+	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
+	 * @param {boolean} [options.fetch=false] Fetches value from db without checking cache. Default is false.
 	 */
 	public get(key: keyof T, options: {
 		raw: true
@@ -19,21 +20,8 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 		raw?: false
 	}): Promise<T[K]>;
 	public get<K extends keyof T>(key: K, options?: {
-		raw?: boolean
-	}): Promise<T[K] | string>;
-	/**
-	 * Fetches a key
-	 * @param {String} key Key
-	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
-	 */
-	public fetch(key: keyof T, options: {
-		raw: true
-	}): Promise<string>;
-	public fetch<K extends keyof T>(key: K, options?: {
-		raw?: false
-	}): Promise<T[K]>;
-	public fetch<K extends keyof T>(key: K, options?: {
-		raw?: boolean
+		raw?: boolean,
+		fetch?: boolean
 	}): Promise<T[K] | string>;
 	/** 
 	 * Sets a key 
@@ -47,23 +35,25 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	 */
 	public delete(key: keyof T): Promise<this>;
 	/**
-	 * List keys starting with a prefix or list all from cache or if none in cache from db.
-	 * @param {String} prefix Filter keys starting with prefix.
-	 */
-	public list(prefix?: string): Promise<(keyof T)[]>;
-	/**
 	 * List keys starting with a prefix or list all.
-	 * @param {String} prefix Filter keys starting with prefix.
+	 * @param {String} [options.prefix] Filter keys starting with prefix.
+	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
 	 */
-	public list(prefix?: string): Promise<(keyof T)[]>;
+	public list(options?: {
+		fetch?: boolean,
+		prefix?: string
+	}): Promise<(keyof T)[]>;
 
 	// Dynamic
 	/** Clears the database. */
 	public empty(): Promise<this>;
-	/** Get all key/value pairs and return as an object */
-	public getAll(): Promise<T>;
-	/** Fetch all key/value pairs and return as an object */
-	public fetchAll(): Promise<T>;
+	/** 
+   * Get all key/value pairs and return as an object
+	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
+	 */
+	public getAll(options?: {
+		fetch?: boolean
+	}): Promise<T>;
 	/** 
 	 * Sets the entire database through an object. 
 	 * @param obj The object. 

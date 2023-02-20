@@ -9,9 +9,11 @@ Repl.it Database client is a simple way to use Repl.it Database in your Node.js 
 ```js
 const { Client } = require("@replit/database");
 const client = new Client();
-await client.set("key", "value");
-let key = await client.get("key");
-console.log(key);
+
+client.set("key", "value").then(async () => {
+	let key = await client.get("key");
+	console.log(key);
+});
 ```
 
 ## Docs
@@ -27,14 +29,10 @@ These functions are specified in the repl.it DB.
 
 Gets a key from cache, if it doesn't exist it fetches. Returns Promise.
 ```js
-client.get("key", { raw: false }).then(console.log);
-```
-
-> `fetch(String key, Object options?)`
-
-Fetches a key. Returns Promise.
-```js
-client.get("key", { raw: false }).then(console.log);
+client.get("key", { 
+	raw: false,
+	fetch: false // Setting this to true ignores cache
+}).then(console.log);
 ```
 
 > `set(String key, Any value)`
@@ -45,13 +43,15 @@ Sets a key to value. Returns Client.
 
 Deletes a key. Returns Client.
 
-> `list(String? prefix)`
-
-Lists all of the keys in cache, or all of the keys starting with `prefix` if specifed.
-
-> `fetchList(String? prefix)`
+> `list(Object options?)`
 
 Lists all of the keys, or all of the keys starting with `prefix` if specifed.
+```js
+client.list({ 
+	prefix: "",
+	fetch: false // Setting this to true fetches from db
+}).then(console.log);
+```
 
 **Dynamic Functions**
 
@@ -61,13 +61,14 @@ These functions have been added by me.
 
 Clears the database. Returns Client
 
-> `getAll()`
+> `getAll(Object options?)`
 
-Get all key/value pairs from cache and return as an object.
-
-> `fetchAll()`
-
-Fetch all key/value pairs and return as an object.
+Get all key/value pairs and return as an object.
+```js
+client.getAll({ 
+	fetch: false // Setting this to true fetches from db
+}).then(console.log);
+```
 
 > `setAll(Object obj)`
 

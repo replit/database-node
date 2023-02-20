@@ -52,7 +52,7 @@ test("fetches a value", async () => {
 		key: "value",
 	});
 
-	expect(await fetchClient.fetchAll()).toEqual({
+	expect(await fetchClient.getAll({ fetch: true })).toEqual({
 		key: "value"
 	});
 });
@@ -60,7 +60,7 @@ test("fetches a value", async () => {
 test("key and value with newline", async () => {
 	await client.set("key\na", "val\nue");
 
-	expect(await fetchClient.fetchAll()).toEqual({
+	expect(await client.getAll()).toEqual({
 		"key\na": "val\nue",
 	});
 });

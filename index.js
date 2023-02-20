@@ -80,11 +80,11 @@ class Client {
 	 */
 	constructor(url, ms = null) {
 		this.cache = new CacheMap(ms);
-		this.#url = url ?
-			url :
-			process.env.REPLIT_DB_URL;
+		this.#url = url || process.env.REPLIT_DB_URL;
+		
 		if (!this.#url) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
-		this.fetchAll().then(keys => {
+		
+		this.getAll({ fetch: true }).then(keys => {
 			for (const key in keys) this.cache.set(key, keys[key]);
 		});
 	}
@@ -94,28 +94,17 @@ class Client {
 	 * Gets a key
 	 * @param {String} key Key
 	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
+	 * @param {boolean} [options.fetch=false] Fetches value from db without checking cache. Default is false.
 	 */
 	async get(key, options = {}) {
-		const value = this.cache.get(key);
+		let value = this.cache.get(key);
 
-		if (!value) return await this.fetch(key, options);
+		if (options.fetch || !value) {
+			value = await request(`${this.#url}/${encodeURIComponent(key)}`).then(r => r.text());
+			this.cache.set(key, value);
+		} 
 
 		if (options.raw) return value;
-
-		return parseJson(value) ?? value;
-	}
-
-	/**
-	 * Fetches a key
-	 * @param {String} key Key
-	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
-	 */
-	async fetch(key, options) {
-		const value = await request(this.#url+'/'+encodeURIComponent(key)).then(r => r.text());
-
-		this.cache.set(key, value);
-
-		if (options?.raw) return value;
 
 		return parseJson(value) ?? value;
 	}
@@ -144,40 +133,33 @@ class Client {
 	 */
 	async delete(key) {
 		this.cache.delete(key);
-		await request(this.#url+'/'+encodeURIComponent(key), { method: "DELETE" });
+		await request(`${this.#url}/${encodeURIComponent(key)}`, { method: "DELETE" });
 		return this;
 	}
 
 	/**
-	 * List keys starting with a prefix or list all from cache or if none in cache from db.
-	 * @param {String} prefix Filter keys starting with prefix.
+	 * List keys starting with a prefix or list all.
+	 * @param {String} [options.prefix] Filter keys starting with prefix.
+	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
 	 */
-	async list(prefix = "") {
-		let keys = [...this.cache.keys()].filter(key => key.startsWith(prefix));
-		if (!keys.length === 0) keys = await this.fetchList(prefix);
-		return keys;
-	}
-
-	/**
-	 * List key starting with a prefix or list all.
-	 * @param {String} prefix Filter keys starting with prefix.
-	 */
-	async fetchList(prefix = "") {
+	async list(options = {}) {
+		if (!options.fetch) return [...this.cache.keys()].filter(key => key.startsWith(options.prefix ?? ""));
+		
 		const text = await request(
-			this.#url+'?encode=true&prefix='+encodeURIComponent(prefix)
+			`${this.#url}?encode=true&prefix=${encodeURIComponent(options.prefix ?? "")}`
 		).then(r => r.text());
 
 		if (text.length === 0) return [];
 		return text.split("\n").map(decodeURIComponent);
 	}
-
+	
 	// Dynamic Functions
 	/**
 	 * Clears the database.
 	 */
 	async empty() {
 		const promises = [];
-		for (const key of await this.fetchList())
+		for (const key of await this.list({ fetch: true }))
       promises.push(this.delete(key));
 
 		await Promise.all(promises);
@@ -187,22 +169,12 @@ class Client {
 
 	/**
 	 * Get all key/value pairs and return as an object.
+	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
 	 */
-	async getAll() {
+	async getAll(options = {}) {
 		let output = {};
-		for (const key of await this.list()) 
-			output[key] = await this.get(key);
-		
-		return output;
-	}
-
-	/**
-	 * Fetch all key/value pairs and return as an object.
-	 */
-	async fetchAll() {
-		let output = {};
-		for (const key of await this.fetchList()) 
-			output[key] = await this.fetch(key);
+		for (const key of await this.list({ fetch: options.fetch })) 
+			output[key] = await this.get(key, { fetch: options.fetch });
 		
 		return output;
 	}
