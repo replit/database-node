@@ -48,7 +48,7 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	/** Clears the database. */
 	public empty(): Promise<this>;
 	/** 
-   * Get all key/value pairs and return as an object
+	 * Get all key/value pairs and return as an object
 	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
 	 */
 	public getAll(options?: {

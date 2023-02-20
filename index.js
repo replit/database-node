@@ -81,9 +81,9 @@ class Client {
 	constructor(url, ms = null) {
 		this.cache = new CacheMap(ms);
 		this.#url = url || process.env.REPLIT_DB_URL;
-		
+
 		if (!this.#url) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
-		
+
 		this.getAll({ fetch: true }).then(keys => {
 			for (const key in keys) this.cache.set(key, keys[key]);
 		});
@@ -102,7 +102,7 @@ class Client {
 		if (options.fetch || !value) {
 			value = await request(`${this.#url}/${encodeURIComponent(key)}`).then(r => r.text());
 			this.cache.set(key, value);
-		} 
+		}
 
 		if (options.raw) return value;
 
@@ -121,7 +121,7 @@ class Client {
 
 		await request(this.#url, {
 			method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			headers: { "Content-Type": "application/x-www-form-urlencoded" },
 			body: `${encodeURIComponent(key)}=${encodeURIComponent(strValue)}`,
 		});
 		return this;
@@ -144,7 +144,7 @@ class Client {
 	 */
 	async list(options = {}) {
 		if (!options.fetch) return [...this.cache.keys()].filter(key => key.startsWith(options.prefix ?? ""));
-		
+
 		const text = await request(
 			`${this.#url}?encode=true&prefix=${encodeURIComponent(options.prefix ?? "")}`
 		).then(r => r.text());
@@ -152,7 +152,7 @@ class Client {
 		if (text.length === 0) return [];
 		return text.split("\n").map(decodeURIComponent);
 	}
-	
+
 	// Dynamic Functions
 	/**
 	 * Clears the database.
@@ -160,7 +160,7 @@ class Client {
 	async empty() {
 		const promises = [];
 		for (const key of await this.list({ fetch: true }))
-      promises.push(this.delete(key));
+			promises.push(this.delete(key));
 
 		await Promise.all(promises);
 
@@ -173,9 +173,9 @@ class Client {
 	 */
 	async getAll(options = {}) {
 		let output = {};
-		for (const key of await this.list({ fetch: options.fetch })) 
+		for (const key of await this.list({ fetch: options.fetch }))
 			output[key] = await this.get(key, { fetch: options.fetch });
-		
+
 		return output;
 	}
 
