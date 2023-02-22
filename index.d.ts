@@ -15,13 +15,13 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	 * @param {boolean} [config.fetch=false] - If true, fetches the value from the database without checking the cache.
 	 * @returns {*} - The value of the key.
 	 */
-	public get(key: keyof T, options: {
+	public get(key: keyof T, config: {
 		raw: true
 	}): Promise<string>;
-	public get<K extends keyof T>(key: K, options?: {
+	public get<K extends keyof T>(key: K, config?: {
 		raw?: false
 	}): Promise<T[K]>;
-	public get<K extends keyof T>(key: K, options?: {
+	public get<K extends keyof T>(key: K, config?: {
 		raw?: boolean,
 		fetch?: boolean
 	}): Promise<T[K] | string>;
@@ -42,7 +42,7 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	 * @param {string} [config.prefix=''] Filter keys starting with prefix.
 	 * @param {boolean} [config.fetch=false] Fetches values from the database. Default is false.
 	 */
-	public list(options?: {
+	public list(config?: {
 		fetch?: boolean,
 		prefix?: string
 	}): Promise<(keyof T)[]>;
@@ -55,7 +55,7 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	 * @param {object} [config] - Configuration options.
 	 * @param {boolean} [config.fetch=false] If true, fetches values from the database. Default is false.
 	 */
-	public getAll(options?: {
+	public getAll(config?: {
 		fetch?: boolean
 	}): Promise<T>;
 	/** 

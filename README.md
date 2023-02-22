@@ -43,7 +43,7 @@ Sets a key to value. Returns Client.
 
 Deletes a key. Returns Client.
 
-> `list(Object options?)`
+> `list(Object config?)`
 
 Lists all of the keys, or all of the keys starting with `prefix` if specifed.
 ```js
@@ -61,7 +61,7 @@ These functions have been added by me.
 
 Clears the database. Returns Client
 
-> `getAll(Object options?)`
+> `getAll(Object config?)`
 
 Get all key/value pairs and return as an object.
 ```js
