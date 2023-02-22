@@ -1,28 +1,12 @@
-const http = require('http');
 const https = require('https');
 
-const httpAgent = new http.Agent({
+const agent = new https.Agent({
 	keepAlive: true
 });
-
-const httpsAgent = new https.Agent({
-	keepAlive: true
-});
-
-const agent = (_parsedURL) => _parsedURL.protocol == 'http:' ? httpAgent : httpsAgent;
 
 const rawFetch = typeof fetch === 'undefined' ? require("./fetch.cjs") : fetch;
 
-// Keep alive for 2x faster requests
-const request = (...args) => {
-	const options = args[1];
-	if (typeof options === 'object')
-		options.agent = agent;
-	else
-		args[1] = { agent };
-
-	return rawFetch(...args);
-};
+const request = (url, options) => rawFetch(url, typeof options === 'object' ? { agent, ...options  } : { agent });
 
 const parseJson = (str) => {
 	if (typeof str !== 'string') return null;
@@ -42,7 +26,7 @@ class CacheMap extends Map {
 	}
 
 	get(key) {
-		let value = super.get(key);
+		const value = super.get(key);
 
 		if (!this.expiration) return value;
 
@@ -50,8 +34,8 @@ class CacheMap extends Map {
 			expiresAt = this.expiration.get(key);
 
 		if (time > expiresAt) {
-			value = null;
 			this.delete(key);
+      return null;
 		}
 
 		return value;
@@ -73,6 +57,7 @@ class CacheMap extends Map {
 
 class Client {
 	#url;
+
 	/**
 	 * Initiates Class.
 	 * @param {String} url Custom database URL
@@ -172,12 +157,13 @@ class Client {
 	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
 	 */
 	async getAll(options = {}) {
-		let output = {};
+		const output = {};
 		for (const key of await this.list({ fetch: options.fetch }))
 			output[key] = await this.get(key, { fetch: options.fetch });
 
 		return output;
 	}
+
 
 	/**
 	 * Sets the entire database through an object.
