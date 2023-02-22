@@ -79,3 +79,21 @@ test("ensure that we escape values when setting", async () => {
   expect(await client.list()).toEqual(["a"])
   expect(await client.get("a")).toEqual("1;b=2")
 });
+
+test("ensure that we escape values when setting", async () => {
+  expect(await client.set("a", "1;b=2")).toEqual(client);
+  expect(await client.list()).toEqual(["a"]);
+  expect(await client.get("a")).toEqual("1;b=2");
+});
+
+test("ensure that we escape values when deleting", async () => {
+  expect(await client.set("a", "1;b=2")).toEqual(client);
+  expect(await client.delete("a;b=2")).toEqual(client);
+  expect(await client.list()).toEqual([]);
+});
+
+test("ensure that we escape values when emptying", async () => {
+  expect(await client.set("a", "1;b=2")).toEqual(client);
+  expect(await client.empty()).toEqual(client);
+  expect(await client.list()).toEqual([]);
+});
