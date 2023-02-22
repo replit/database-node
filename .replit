@@ -3,15 +3,14 @@ run = "npm run test"
 entrypoint = "index.js"
 
 hidden = [".config", "package-lock.json"]
-modules = ["yes"]
 
 [interpreter]
 command = [
-    "prybar-nodejs",
-    "-q",
-    "--ps1",
-    "\u0001\u001b[33m\u0002\u0001\u001b[00m\u0002 ",
-    "-i"
+  "prybar-nodejs",
+  "-q",
+  "--ps1",
+  "\u0001\u001b[33m\u0002\u0001\u001b[00m\u0002 ",
+  "-i"
 ]
 
 [[hints]]
