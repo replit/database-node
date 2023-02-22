@@ -7,11 +7,13 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	constructor(url?: string, ms?: number);
 
 	// Native
-	/** 
-	 * Gets a key 
-	 * @param {String} key Key
-	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
-	 * @param {boolean} [options.fetch=false] Fetches value from db without checking cache. Default is false.
+	/**
+	 * Retrieves a value from the cache or the database.
+	 * @param {string} key - The key to retrieve.
+	 * @param {object} [config] - Configuration options.
+	 * @param {boolean} [config.raw=false] - If true, returns the raw string value instead of parsing it.
+	 * @param {boolean} [config.fetch=false] - If true, fetches the value from the database without checking the cache.
+	 * @returns {*} - The value of the key.
 	 */
 	public get(key: keyof T, options: {
 		raw: true
@@ -36,8 +38,9 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	public delete(key: keyof T): Promise<this>;
 	/**
 	 * List keys starting with a prefix or list all.
-	 * @param {String} [options.prefix] Filter keys starting with prefix.
-	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
+	 * @param {object} [config] - Configuration options.
+	 * @param {string} [config.prefix=''] Filter keys starting with prefix.
+	 * @param {boolean} [config.fetch=false] Fetches values from the database. Default is false.
 	 */
 	public list(options?: {
 		fetch?: boolean,
@@ -47,9 +50,10 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	// Dynamic
 	/** Clears the database. */
 	public empty(): Promise<this>;
-	/** 
-	 * Get all key/value pairs and return as an object
-	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
+	/**
+	 * Get all key/value pairs and return as an object.
+	 * @param {object} [config] - Configuration options.
+	 * @param {boolean} [config.fetch=false] If true, fetches values from the database. Default is false.
 	 */
 	public getAll(options?: {
 		fetch?: boolean

@@ -6,7 +6,8 @@ const agent = new https.Agent({
 
 const rawFetch = typeof fetch === 'undefined' ? require("./fetch.cjs") : fetch;
 
-const request = (url, options) => rawFetch(url, typeof options === 'object' ? { agent, ...options  } : { agent });
+const request = (url, options) =>
+	rawFetch(url, typeof options === 'object' ? { agent, ...options } : { agent });
 
 const parseJson = (str) => {
 	if (typeof str !== 'string') return null;
@@ -35,7 +36,7 @@ class CacheMap extends Map {
 
 		if (time > expiresAt) {
 			this.delete(key);
-      return null;
+			return null;
 		}
 
 		return value;
@@ -75,28 +76,33 @@ class Client {
 	}
 
 	// Native Functions
+
 	/**
-	 * Gets a key
-	 * @param {String} key Key
-	 * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
-	 * @param {boolean} [options.fetch=false] Fetches value from db without checking cache. Default is false.
+	 * Retrieves a value from the cache or the database.
+	 * @param {string} key - The key to retrieve.
+	 * @param {object} [config] - Configuration options.
+	 * @param {boolean} [config.raw=false] - If true, returns the raw string value instead of parsing it.
+	 * @param {boolean} [config.fetch=false] - If true, fetches the value from the database without checking the cache.
+	 * @returns {*} - The value of the key.
 	 */
-	async get(key, options = {}) {
+	async get(key, config = {}) {
+		const { raw = false, fetch = false } = config;
+		
 		let value = this.cache.get(key);
 
-		if (options.fetch || !value) {
-			value = await request(`${this.#url}/${encodeURIComponent(key)}`).then(r => r.text());
+		if (fetch || !value) {
+			value = await request(`${this.#url}/${encodeURIComponent(key)}`).then(res => res.text());
 			this.cache.set(key, value);
 		}
 
-		if (options.raw) return value;
+		if (raw) return value;
 
 		return parseJson(value) ?? value;
 	}
 
 	/**
 	 * Sets a key
-	 * @param {String} key Key
+	 * @param {string} key Key
 	 * @param {any} value Value
 	 */
 	async set(key, value) {
@@ -124,21 +130,25 @@ class Client {
 
 	/**
 	 * List keys starting with a prefix or list all.
-	 * @param {String} [options.prefix] Filter keys starting with prefix.
-	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
+	 * @param {object} [config] - Configuration options.
+	 * @param {string} [config.prefix=''] Filter keys starting with prefix.
+	 * @param {boolean} [config.fetch=false] Fetches values from the database. Default is false.
 	 */
-	async list(options = {}) {
-		if (!options.fetch) return [...this.cache.keys()].filter(key => key.startsWith(options.prefix ?? ""));
+	async list(config = {}) {
+		const { prefix = '', fetch = false } = config;
+		
+		if (!fetch) return [...this.cache.keys()].filter(key => key.startsWith(prefix));
 
 		const text = await request(
-			`${this.#url}?encode=true&prefix=${encodeURIComponent(options.prefix ?? "")}`
-		).then(r => r.text());
+			`${this.#url}?encode=true&prefix=${encodeURIComponent(prefix)}`
+		).then(res => res.text());
 
 		if (text.length === 0) return [];
 		return text.split("\n").map(decodeURIComponent);
 	}
 
 	// Dynamic Functions
+
 	/**
 	 * Clears the database.
 	 */
@@ -154,16 +164,18 @@ class Client {
 
 	/**
 	 * Get all key/value pairs and return as an object.
-	 * @param {boolean} [options.fetch=false] Fetches values from db. Default is false.
+	 * @param {object} [config] - Configuration options.
+	 * @param {boolean} [config.fetch=false] If true, fetches values from the database. Default is false.
 	 */
-	async getAll(options = {}) {
+	async getAll(config = {}) {
+		const { fetch = false } = config;
+		
 		const output = {};
-		for (const key of await this.list({ fetch: options.fetch }))
-			output[key] = await this.get(key, { fetch: options.fetch });
+		for (const key of await this.list({ fetch }))
+			output[key] = await this.get(key, { fetch });
 
 		return output;
 	}
-
 
 	/**
 	 * Sets the entire database through an object.

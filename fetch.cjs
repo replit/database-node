@@ -1,1 +1,1 @@
-module.exports=(...args)=>import('node-fetch').then(({default:f})=>f(...args));
+module.exports = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));

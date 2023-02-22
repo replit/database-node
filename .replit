@@ -3,6 +3,7 @@ run = "npm run test"
 entrypoint = "index.js"
 
 hidden = [".config", "package-lock.json"]
+modules = ["yes"]
 
 [interpreter]
 command = [
@@ -39,7 +40,7 @@ language = "nodejs"
 [languages]
 
 [languages.javascript]
-pattern = "**/{*.js,*.jsx,*.ts,*.tsx}"
+pattern = "**/{*.js,*.jsx,*.ts,*.tsx,*.cjs}"
 
 [languages.javascript.languageServer]
 start = "typescript-language-server --stdio"

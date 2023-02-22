@@ -25,9 +25,9 @@ The parameter ms is millseconds till cache expires.
 
 These functions are specified in the repl.it DB.
 
-> `get(String key, Object options?)`
+> `get(String key, Object config?)`
 
-Gets a key from cache, if it doesn't exist it fetches. Returns Promise.
+Gets a value from cache or from the database if it doesn't exist. Returns Promise.
 ```js
 client.get("key", { 
 	raw: false,
