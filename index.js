@@ -1,4 +1,4 @@
-const fetch = require("node-fetch");
+const fetch = require('node-fetch');
 
 class Client {
   /**
@@ -17,7 +17,7 @@ class Client {
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
   async get(key, options) {
-    return await fetch(this.key + "/" + key)
+    return await fetch(this.key + '/' + key)
       .then((e) => e.text())
       .then((strValue) => {
         if (options && options.raw) {
@@ -55,9 +55,9 @@ class Client {
     const strValue = JSON.stringify(value);
 
     await fetch(this.key, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: encodeURIComponent(key) + '=' + encodeURIComponent(strValue),
     });
     return this;
   }
@@ -67,7 +67,7 @@ class Client {
    * @param {String} key Key
    */
   async delete(key) {
-    await fetch(this.key + "/" + key, { method: "DELETE" });
+    await fetch(this.key + '/' + encodeURIComponent(key), { method: 'DELETE' });
     return this;
   }
 
@@ -75,7 +75,7 @@ class Client {
    * List key starting with a prefix or list all.
    * @param {String} prefix Filter keys starting with prefix.
    */
-  async list(prefix = "") {
+  async list(prefix = '') {
     return await fetch(
       this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`
     )
@@ -84,7 +84,7 @@ class Client {
         if (t.length === 0) {
           return [];
         }
-        return t.split("\n").map(decodeURIComponent);
+        return t.split('\n').map(decodeURIComponent);
       });
   }
 
