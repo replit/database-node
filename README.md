@@ -27,11 +27,11 @@ These functions are specified in the repl.it DB.
 
 > `get(String key, Object config?)`
 
-Gets a value from cache or from the database if it doesn't exist. Returns Promise.
+Gets a value from cache or from the database. Returns Promise.
 ```js
 client.get("key", { 
 	raw: false,
-	fetch: false // Setting this to true ignores cache
+	fetch: false // Setting this to true fetches db
 }).then(console.log);
 ```
 

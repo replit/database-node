@@ -82,22 +82,23 @@ class Client {
 	 * @param {string} key - The key to retrieve.
 	 * @param {object} [config] - Configuration options.
 	 * @param {boolean} [config.raw=false] - If true, returns the raw string value instead of parsing it.
-	 * @param {boolean} [config.fetch=false] - If true, fetches the value from the database without checking the cache.
+	 * @param {boolean} [config.fetch=false] - If true, fetches the value from the database.
 	 * @returns {*} - The value of the key.
 	 */
 	async get(key, config = {}) {
 		const { raw = false, fetch = false } = config;
-		
-		let value = this.cache.get(key);
 
-		if (fetch || !value) {
-			value = await request(`${this.#url}/${encodeURIComponent(key)}`).then(res => res.text());
+		let value;
+
+		if (!fetch) {
+			value = this.cache.get(key);
+		} else {
+			value = await request(`${this.#url}/${encodeURIComponent(key)}`)
+				.then(res => res.text());
 			this.cache.set(key, value);
 		}
 
-		if (raw) return value;
-
-		return parseJson(value) ?? value;
+		return raw ? value : parseJson(value) ?? value;
 	}
 
 	/**
@@ -136,7 +137,7 @@ class Client {
 	 */
 	async list(config = {}) {
 		const { prefix = '', fetch = false } = config;
-		
+
 		if (!fetch) return [...this.cache.keys()].filter(key => key.startsWith(prefix));
 
 		const text = await request(
@@ -169,7 +170,7 @@ class Client {
 	 */
 	async getAll(config = {}) {
 		const { fetch = false } = config;
-		
+
 		const output = {};
 		for (const key of await this.list({ fetch }))
 			output[key] = await this.get(key, { fetch });

@@ -12,7 +12,7 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	 * @param {string} key - The key to retrieve.
 	 * @param {object} [config] - Configuration options.
 	 * @param {boolean} [config.raw=false] - If true, returns the raw string value instead of parsing it.
-	 * @param {boolean} [config.fetch=false] - If true, fetches the value from the database without checking the cache.
+	 * @param {boolean} [config.fetch=false] - If true, fetches the value from the database.
 	 * @returns {*} - The value of the key.
 	 */
 	public get(key: keyof T, config: {
