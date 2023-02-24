@@ -31,7 +31,7 @@ Gets a value from cache or from the database. Returns Promise.
 ```js
 client.get("key", { 
 	raw: false,
-	fetch: false // Setting this to true fetches db
+	fetch: false // Setting this to true fetches from db
 }).then(console.log);
 ```
 
@@ -55,7 +55,7 @@ client.list({
 
 **Dynamic Functions**
 
-These functions have been added by me.
+These functions extend the normal db functions.
 
 > `empty()`
 
@@ -72,7 +72,7 @@ client.getAll({
 
 > `setAll(Object obj)`
 
-Sets the entire database through a key/value object. Returns Client
+Sets all of the keys in a key/value object. Returns Client.
 
 > `deleteMultiple(...String args)`
 
