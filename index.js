@@ -160,11 +160,9 @@ class Client {
 	 * Clears the database.
 	 */
 	async empty() {
-		const promises = [];
-		for (const key of await this.list({ fetch: true }))
-			promises.push(this.delete(key));
-
-		await Promise.all(promises);
+		const keys = await this.list({ fetch: true });
+		for (let i = 0; i < keys.length; i++) 
+			await this.delete(keys[i]);
 
 		return this;
 	}
@@ -178,8 +176,13 @@ class Client {
 		const { fetch = false } = config;
 
 		const output = {};
-		for (const key of await this.list({ fetch }))
+
+		const keys = await this.list({ fetch: true });
+		for (let i = 0; i < keys.length; i++) {
+			const key = keys[i];
 			output[key] = await this.get(key, { fetch });
+		}
+			
 
 		return output;
 	}
@@ -198,11 +201,8 @@ class Client {
 	 * @param {Array<string>} args Keys
 	 */
 	async deleteMultiple(...args) {
-		const promises = [];
-
-		for (const arg of args) promises.push(this.delete(arg));
-
-		await Promise.all(promises);
+		for (let i = 0; i < args.length; i++) 
+			await this.delete(args[i]);
 
 		return this;
 	}
