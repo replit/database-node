@@ -4,10 +4,9 @@ const agent = new https.Agent({
 	keepAlive: true
 });
 
-const rawFetch = typeof fetch === 'undefined' ? require("./fetch.cjs") : fetch;
+const rawFetch = typeof fetch === 'undefined' ? require('./fetch.cjs') : fetch;
 
-const request = (url, options) =>
-	rawFetch(url, typeof options === 'object' ? { agent, ...options } : { agent });
+const request = (url, options) => rawFetch(url, typeof options === 'object' ? { agent, ...options } : { agent });
 
 const parseJson = (str) => {
 	if (typeof str !== 'string') return null;
@@ -68,7 +67,7 @@ class Client {
 		this.cache = new CacheMap(ms);
 		this.#url = url || process.env.REPLIT_DB_URL;
 
-		if (!this.#url) throw new Error("You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.");
+		if (!this.#url) throw new Error('You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.');
 
 		this.getAll({ fetch: true }).then(keys => {
 			for (const key in keys) this.cache.set(key, keys[key]);
@@ -112,8 +111,8 @@ class Client {
 		this.cache.set(key, strValue);
 
 		await request(this.#url, {
-			method: "POST",
-			headers: { "Content-Type": "application/x-www-form-urlencoded" },
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: `${encodeURIComponent(key)}=${encodeURIComponent(strValue)}`,
 		});
 		return this;
@@ -125,7 +124,7 @@ class Client {
 	 */
 	async delete(key) {
 		this.cache.delete(key);
-		await request(`${this.#url}/${encodeURIComponent(key)}`, { method: "DELETE" });
+		await request(`${this.#url}/${encodeURIComponent(key)}`, { method: 'DELETE' });
 		return this;
 	}
 
@@ -145,7 +144,7 @@ class Client {
 		).then(res => res.text());
 
 		if (text.length === 0) return [];
-		return text.split("\n").map(decodeURIComponent);
+		return text.split('\n').map(decodeURIComponent);
 	}
 
 	// Dynamic Functions
