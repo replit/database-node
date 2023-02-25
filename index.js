@@ -161,7 +161,7 @@ class Client {
 	 */
 	async empty() {
 		const keys = await this.list({ fetch: true });
-		for (let i = 0; i < keys.length; i++) 
+		for (let i = 0; i < keys.length; i++)
 			await this.delete(keys[i]);
 
 		return this;
@@ -182,7 +182,6 @@ class Client {
 			const key = keys[i];
 			output[key] = await this.get(key, { fetch });
 		}
-			
 
 		return output;
 	}
@@ -201,7 +200,7 @@ class Client {
 	 * @param {Array<string>} args Keys
 	 */
 	async deleteMultiple(...args) {
-		for (let i = 0; i < args.length; i++) 
+		for (let i = 0; i < args.length; i++)
 			await this.delete(args[i]);
 
 		return this;
