@@ -1,3 +1,10 @@
+const { emitWarning } = process;
+
+process.emitWarning = (warning, ...args) => {
+	if (args[0] === 'ExperimentalWarning' || args[0]?.type === 'ExperimentalWarning') return;
+	return emitWarning(warning, ...args);
+};
+
 const https = require('https');
 
 const agent = new https.Agent({
