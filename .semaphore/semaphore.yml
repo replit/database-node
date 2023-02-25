@@ -11,7 +11,7 @@ blocks:
         - name: Test
           commands:
             - checkout
-            - sem-version node 12
+            - sem-version node 18
             - cache restore
             - npm install
             - cache store
