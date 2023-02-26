@@ -2,9 +2,8 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 	/** 
 	 * Initiates Class. 
 	 * @param url Custom database URL
-	 * @param {?number} [ms=null] Milliseconds till cache expires or null for no cache expiration
 	 */
-	constructor(url?: string, ms?: number);
+	constructor(url?: string);
 
 	// Native
 	/**
@@ -59,10 +58,10 @@ declare class Client<T extends Record<string, unknown> = Record<string, unknown>
 		fetch?: boolean
 	}): Promise<T>;
 	/** 
-	 * Sets the entire database through an object. 
+	 * Sets the multiple entries through an object. 
 	 * @param obj The object. 
 	 */
-	public setAll(obj: Partial<T>): Promise<this>;
+	public setMultiple(obj: Partial<T>): Promise<this>;
 	/** 
 	 * Delete multiple entries by keys 
 	 * @param args Keys 

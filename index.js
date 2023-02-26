@@ -24,61 +24,20 @@ const parseJson = (str) => {
 	}
 }
 
-class CacheMap extends Map {
-	constructor(ms) {
-		super();
-		if (ms === null) return;
-		this.expiration = new Map();
-		this.expiration.ms = ms;
-	}
-
-	get(key) {
-		const value = super.get(key);
-
-		if (!this.expiration) return value;
-
-		const time = new Date().getTime(),
-			expiresAt = this.expiration.get(key);
-
-		if (time > expiresAt) {
-			this.delete(key);
-			return null;
-		}
-
-		return value;
-	}
-
-	set(key, value) {
-		if (this.expiration) {
-			const expiresAt = new Date().getTime() + this.expiration.ms;
-			this.expiration.set(key, expiresAt);
-		}
-		return super.set(key, value);
-	}
-
-	delete(key) {
-		if (this.expiration) this.expiration.delete(key);
-		return super.delete(key);
-	}
-}
-
 class Client {
 	#url;
 
 	/**
 	 * Initiates Class.
 	 * @param {String} url Custom database URL
-	 * @param {?number} [ms=null] Milliseconds till cache expires or null for no cache expiry
 	 */
-	constructor(url, ms = null) {
-		this.cache = new CacheMap(ms);
+	constructor(url) {
 		this.#url = url || process.env.REPLIT_DB_URL;
 
 		if (!this.#url) throw new Error('You must either pass a database URL into the Client constructor, or you must set the REPLIT_DB_URL environment variable. If you are using the repl.it editor, you must log in to get an auto-generated REPLIT_DB_URL environment variable.');
 
-		this.getAll({ fetch: true }).then(keys => {
-			for (const key in keys) this.cache.set(key, keys[key]);
-		});
+		this.cache = {};
+		this.getAll({ fetch: true });
 	}
 
 	// Native Functions
@@ -97,11 +56,11 @@ class Client {
 		let value;
 
 		if (!fetch) {
-			value = this.cache.get(key);
+			value = this.cache[key];
 		} else {
 			value = await request(`${this.#url}/${encodeURIComponent(key)}`)
 				.then(res => res.text());
-			this.cache.set(key, value);
+			this.cache[key] = value;
 		}
 
 		return raw ? value : parseJson(value) ?? value;
@@ -115,7 +74,7 @@ class Client {
 	async set(key, value) {
 		const strValue = JSON.stringify(value);
 
-		this.cache.set(key, strValue);
+		this.cache[key] = value;
 
 		await request(this.#url, {
 			method: 'POST',
@@ -130,7 +89,7 @@ class Client {
 	 * @param {String} key Key
 	 */
 	async delete(key) {
-		this.cache.delete(key);
+		delete this.cache[key];
 		await request(`${this.#url}/${encodeURIComponent(key)}`, { method: 'DELETE' });
 		return this;
 	}
@@ -144,7 +103,7 @@ class Client {
 	async list(config = {}) {
 		const { prefix = '', fetch = false } = config;
 
-		if (!fetch) return [...this.cache.keys()].filter(key => key.startsWith(prefix));
+		if (!fetch) return Object.keys(this.cache).filter(key => key.startsWith(prefix));
 
 		const text = await request(
 			`${this.#url}?encode=true&prefix=${encodeURIComponent(prefix)}`
@@ -177,7 +136,7 @@ class Client {
 
 		const output = {};
 
-		const keys = await this.list({ fetch: true });
+		const keys = await this.list({ fetch });
 		for (let i = 0; i < keys.length; i++) {
 			const key = keys[i];
 			output[key] = await this.get(key, { fetch });
@@ -187,10 +146,10 @@ class Client {
 	}
 
 	/**
-	 * Sets the entire database through an object.
+	 * Sets the multiple entries through an object.
 	 * @param {Object} obj The object.
 	 */
-	async setAll(obj) {
+	async setMultiple(obj) {
 		for (const key in obj) await this.set(key, obj[key]);
 		return this;
 	}

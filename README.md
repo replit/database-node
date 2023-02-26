@@ -17,9 +17,8 @@ client.set("key", "value").then(async () => {
 ```
 
 ## Docs
-### `class Client(String url?, Number ms?)`
+### `class Client(String url?)`
 The parameter url is the optional custom DB URL.
-The parameter ms is millseconds till cache expires.
 
 **Native Functions**
 
@@ -70,9 +69,9 @@ client.getAll({
 }).then(console.log);
 ```
 
-> `setAll(Object obj)`
+> `setMultiple(Object obj)`
 
-Sets all of the keys in a key/value object. Returns Client.
+Sets key/value pairs from an object. Returns Client.
 
 > `deleteMultiple(...String args)`
 
