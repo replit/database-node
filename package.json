@@ -1,6 +1,6 @@
 {
   "name": "@replit/database",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "Client for Repl.it Database",
   "main": "index.js",
   "scripts": {
@@ -10,6 +10,10 @@
     {
       "name": "Junhao Zhang",
       "url": "https://github.com/mrlapizgithub/repl.it-db"
+    },
+    {
+      "name": "Mech",
+      "url": "https://github.com/7hemech"
     }
   ],
   "license": "MIT",
@@ -17,10 +21,10 @@
     "type": "git",
     "url": "https://github.com/replit/database-node.git"
   },
-  "dependencies": {
-    "node-fetch": "^2.6.0"
-  },
   "devDependencies": {
-    "jest": "^26.1.0"
+    "jest": "^29.4.3"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.0"
   }
 }

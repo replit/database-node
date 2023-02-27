@@ -7,26 +7,31 @@ Repl.it Database client is a simple way to use Repl.it Database in your Node.js 
 
 ## Get started
 ```js
-const Client = require("@replit/database");
+const { Client } = require("@replit/database");
 const client = new Client();
-await client.set("key", "value");
-let key = await client.get("key");
-console.log(key);
+
+client.set("key", "value").then(async () => {
+	let key = await client.get("key");
+	console.log(key);
+});
 ```
 
 ## Docs
-### `class Client(String key?)`
-The key is the optional custom URL.
+### `class Client(String url?)`
+The parameter url is the optional custom DB URL.
 
 **Native Functions**
 
 These functions are specified in the repl.it DB.
 
-> `get(String key, Object options?)`
+> `get(String key, Object config?)`
 
-Gets a key. Returns Promise.
+Gets a value from cache or from the database. Returns Promise.
 ```js
-client.get("key", { raw: false }).then(console.log);
+client.get("key", {
+	fetch: false,
+	raw: false,
+});
 ```
 
 > `set(String key, Any value)`
@@ -37,25 +42,36 @@ Sets a key to value. Returns Client.
 
 Deletes a key. Returns Client.
 
-> `list(String? prefix)`
+> `list(Object config?)`
 
 Lists all of the keys, or all of the keys starting with `prefix` if specifed.
+```js
+client.list({
+	fetch: false,
+	prefix: "",
+});
+```
 
 **Dynamic Functions**
 
-These functions have been added by me.
+These functions extend the normal db functions.
 
 > `empty()`
 
 Clears the database. Returns Client
 
-> `getAll()`
+> `getAll(Object config?)`
 
 Get all key/value pairs and return as an object.
+```js
+client.getAll({ 
+	fetch: false,
+});
+```
 
-> `setAll(Object obj)`
+> `setMultiple(Object obj)`
 
-Sets the entire database through a key/value object. Returns Client
+Sets key/value pairs from an object. Returns Client.
 
 > `deleteMultiple(...String args)`
 
