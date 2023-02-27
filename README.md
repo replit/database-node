@@ -28,10 +28,10 @@ These functions are specified in the repl.it DB.
 
 Gets a value from cache or from the database. Returns Promise.
 ```js
-client.get("key", { 
+client.get("key", {
+	fetch: false,
 	raw: false,
-	fetch: false // Setting this to true fetches from db
-}).then(console.log);
+});
 ```
 
 > `set(String key, Any value)`
@@ -46,10 +46,10 @@ Deletes a key. Returns Client.
 
 Lists all of the keys, or all of the keys starting with `prefix` if specifed.
 ```js
-client.list({ 
+client.list({
+	fetch: false,
 	prefix: "",
-	fetch: false // Setting this to true fetches from db
-}).then(console.log);
+});
 ```
 
 **Dynamic Functions**
@@ -65,8 +65,8 @@ Clears the database. Returns Client
 Get all key/value pairs and return as an object.
 ```js
 client.getAll({ 
-	fetch: false // Setting this to true fetches from db
-}).then(console.log);
+	fetch: false,
+});
 ```
 
 > `setMultiple(Object obj)`
