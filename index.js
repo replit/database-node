@@ -58,8 +58,7 @@ class Client {
 		if (!fetch) {
 			value = this.cache[key];
 		} else {
-			value = await request(`${this.#url}/${encodeURIComponent(key)}`)
-				.then(res => res.text());
+			value = await request(`${this.#url}/${encodeURIComponent(key)}`).then(res => res.text());
 			this.cache[key] = value;
 		}
 
