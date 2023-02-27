@@ -15,12 +15,12 @@ const rawFetch = typeof fetch === 'undefined' ? require('./fetch.cjs') : fetch;
 
 const request = (url, options) => rawFetch(url, typeof options === 'object' ? { agent, ...options } : { agent });
 
-const parseJson = (str) => {
-	if (typeof str !== 'string') return null;
+const parseJson = (val) => {
+	if (typeof val !== 'string') return val;
 	try {
-		return JSON.parse(str);
+		return JSON.parse(val);
 	} catch (err) {
-		return null;
+		return val;
 	}
 }
 
@@ -51,7 +51,7 @@ class Client {
 	 * @returns {*} - The value of the key.
 	 */
 	async get(key, config = {}) {
-		const { raw = false, fetch = false } = config;
+		const { fetch = false, raw = false } = config;
 
 		let value;
 
@@ -63,7 +63,7 @@ class Client {
 			this.cache[key] = value;
 		}
 
-		return raw ? value : parseJson(value) ?? value;
+		return raw ? value : parseJson(value);
 	}
 
 	/**
@@ -74,7 +74,7 @@ class Client {
 	async set(key, value) {
 		const strValue = JSON.stringify(value);
 
-		this.cache[key] = value;
+		this.cache[key] = strValue;
 
 		await request(this.#url, {
 			method: 'POST',
@@ -101,7 +101,7 @@ class Client {
 	 * @param {boolean} [config.fetch=false] Fetches values from the database. Default is false.
 	 */
 	async list(config = {}) {
-		const { prefix = '', fetch = false } = config;
+		const { fetch = false, prefix = '' } = config;
 
 		if (!fetch) return Object.keys(this.cache).filter(key => key.startsWith(prefix));
 
