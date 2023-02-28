@@ -11,7 +11,7 @@ beforeAll(async () => {
     },
   });
   const url = await resp.text();
-  client = new Client(url);
+  client = new Client(process.env.REPLIT_DB_URL ?? url);
   await client.empty();
 });
 
