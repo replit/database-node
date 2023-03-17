@@ -91,3 +91,8 @@ test("ensure that we escape key when emptying", async () => {
   expect(await client.empty()).toEqual(client);
   expect(await client.list()).toEqual([]);
 });
+
+test("ensure that we escape keys when getting", async () => {
+  expect(await client.set("https://url.com/foo?bar=bazz", "a")).toEqual(client);
+  expect(await client.get("https://url.com/foo?bar=bazz")).toEqual("a");
+});
