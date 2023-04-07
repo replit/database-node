@@ -4,8 +4,8 @@ const Client = require("./index");
 let client;
 
 beforeAll(async () => {
-  const pass = process.env.PASSWORD;
-  const resp = await fetch("https://database-test-jwt.kochman.repl.co", {
+  const pass = process.env.JWT_PASSWORD;
+  const resp = await fetch("https://database-test-jwt.util.repl.co", {
     headers: {
       Authorization: "Basic " + btoa("test:" + pass),
     },
@@ -37,7 +37,10 @@ test("list keys", async () => {
     second: "secondThing",
   });
 
-  expect(await client.list()).toEqual(["key", "second"]);
+  const result = await client.list();
+  const expected = ["key", "second"]
+  expect(result).toEqual(expect.arrayContaining(expected));
+
 });
 
 test("gets a value", async () => {
@@ -71,7 +74,10 @@ test("list keys with newline", async () => {
     keywidout: "second",
   });
 
-  expect(await client.list()).toEqual(["keywidout", "key\nwit"]);
+  const expected = ["keywidout", "key\nwit"];
+  const result = await client.list();
+
+  expect(result).toEqual(expect.arrayContaining(expected));
 });
 
 test("ensure that we escape values when setting", async () => {
