@@ -4,14 +4,15 @@ const Client = require("./index");
 let client;
 
 beforeAll(async () => {
-  const pass = process.env.JWT_PASSWORD;
-  const resp = await fetch("https://database-test-jwt.util.repl.co", {
+  const pass = process.env.USE_FILE ? process.env.RIDT_PASSWORD : process.env.JWT_PASSWORD;
+  const url = process.env.USE_FILE ? "https://database-test-ridt.util.repl.co" : "https://database-test-jwt.util.repl.co";
+  const resp = await fetch(url, {
     headers: {
       Authorization: "Basic " + btoa("test:" + pass),
     },
   });
-  const url = await resp.text();
-  client = new Client(url);
+  const token = await resp.text();
+  client = new Client(token);
   await client.empty();
 });
 
