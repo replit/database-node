@@ -4,8 +4,8 @@ const Client = require("./index");
 let client;
 
 beforeAll(async () => {
-  const pass = process.env.PASSWORD;
-  const resp = await fetch("https://database-test-jwt.kochman.repl.co", {
+  const pass = process.env.JWT_PASSWORD;
+  const resp = await fetch("https://database-test-jwt.util.repl.co", {
     headers: {
       Authorization: "Basic " + btoa("test:" + pass),
     },
