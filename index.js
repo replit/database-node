@@ -1,4 +1,7 @@
 const fetch = require("node-fetch");
+const fs = require("fs");
+
+const replitDBFilename = "/tmp/replitdb"
 
 class Client {
   /**
@@ -7,7 +10,15 @@ class Client {
    */
   constructor(key) {
     if (key) this.key = key;
-    else this.key = process.env.REPLIT_DB_URL;
+    else {
+      // Try to read string from file, fall back to 
+      // environment variable if it doesn't exist
+      try {
+        this.key = fs.readFileSync(replitDBFilename, "utf8");
+      } catch (err) {
+        this.key = process.env.REPLIT_DB_URL;
+      }
+    }
   }
 
   // Native Functions
