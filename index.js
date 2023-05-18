@@ -9,15 +9,13 @@ class Client {
    * @param {String} key Custom database URL
    */
   constructor(key) {
-    if (key) this.key = key;
-    else {
-      // Try to read string from file, fall back to 
-      // environment variable if it doesn't exist
-      try {
-        this.key = fs.readFileSync(replitDBFilename, "utf8");
-      } catch (err) {
-        this.key = process.env.REPLIT_DB_URL;
-      }
+    if (key) {
+      this.key = key;
+    } else {
+      this.key = getKey();
+      setInterval(() => {
+        this.key = getKey();
+      }, 1000 * 60 * 60);
     }
   }
 
@@ -156,3 +154,11 @@ class Client {
 }
 
 module.exports = Client;
+
+function getKey() {
+  try {
+    return fs.readFileSync(replitDBFilename, "utf8");
+  } catch (err) {
+    return process.env.REPLIT_DB_URL;
+  }
+}
