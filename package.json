@@ -1,6 +1,6 @@
 {
   "name": "@replit/database",
-  "version": "2.0.2",
+  "version": "2.0.4",
   "description": "Client for Repl.it Database",
   "main": "index.js",
   "scripts": {
