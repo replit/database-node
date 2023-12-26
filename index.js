@@ -15,7 +15,7 @@ class Client {
       this.key = getKey();
       setInterval(() => {
         this.key = getKey();
-      }, 1000 * 60 * 60);
+      }, 1000 * 60 * 60).unref();
     }
   }
 
