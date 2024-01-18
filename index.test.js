@@ -5,7 +5,7 @@ let client;
 
 beforeAll(async () => {
   const pass = process.env.USE_FILE ? process.env.RIDT_PASSWORD : process.env.JWT_PASSWORD;
-  const url = process.env.USE_FILE ? "https://database-test-ridt.util.repl.co" : "https://database-test-jwt.util.repl.co";
+  const url = process.env.USE_FILE ? "https://database-test-ridt-util.replit.app" : "https://database-test-jwt-util.replit.app";
   const resp = await fetch(url, {
     headers: {
       Authorization: "Basic " + btoa("test:" + pass),
