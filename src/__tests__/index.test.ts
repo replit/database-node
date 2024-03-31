@@ -3,7 +3,26 @@ import Client from "../index";
 let client: Client;
 
 beforeAll(async () => {
-  client = new Client();
+  if (process.env.REPL_ID) {
+    // testing locally
+    client = new Client();
+  } else {
+    // testing from CI
+    const pass = process.env.USE_FILE
+      ? process.env.RIDT_PASSWORD
+      : process.env.JWT_PASSWORD;
+    const url = process.env.USE_FILE
+      ? "https://database-test-ridt-util.replit.app"
+      : "https://database-test-jwt-util.replit.app";
+    const resp = await fetch(url, {
+      headers: {
+        Authorization: "Basic " + btoa("test:" + pass),
+      },
+    });
+    const token = await resp.text();
+    client = new Client(token);
+  }
+
   await client.empty();
 });
 
