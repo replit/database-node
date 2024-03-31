@@ -172,9 +172,16 @@ export default class Client {
 }
 
 function getKey(): string {
+  let key: string | undefined;
   try {
-    return readFileSync(replitDBFilename, "utf8");
+    key = readFileSync(replitDBFilename, "utf8");
   } catch (err) {
-    return process.env.REPLIT_DB_URL ?? "";
+    key = process.env.REPLIT_DB_URL;
   }
+
+  if (!key) {
+    throw new Error("expected key, got undefined");
+  }
+
+  return key;
 }
