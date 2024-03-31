@@ -17,7 +17,9 @@ beforeAll(async () => {
       : "https://database-test-jwt-util.replit.app";
     const resp = await fetch(url, {
       headers: {
-        Authorization: "Basic " + btoa("test:" + pass),
+        Authorization: `Basic ${Buffer.from(`test:${pass}`).toString(
+          "base64",
+        )}`,
       },
     });
     const token = await resp.text();
