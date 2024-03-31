@@ -132,11 +132,12 @@ export default class Client {
 
   /**
    * Get all key/value pairs and return as an object
+   * @param {boolean} [options.raw=false] Makes it so that we return the raw string value for each key. Default is false.
    */
-  async getAll() {
+  async getAll(options?: { raw: boolean }) {
     let output: Record<string, string | null> = {};
     for (const key of await this.list()) {
-      let value = await this.get(key);
+      let value = await this.get(key, options);
       output[key] = value;
     }
     return output;
