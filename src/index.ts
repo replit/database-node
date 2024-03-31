@@ -1,22 +1,40 @@
-const fetch = require("node-fetch");
-const fs = require("fs");
+import fetch from "node-fetch";
+import { readFileSync } from "fs";
 
-const replitDBFilename = "/tmp/replitdb"
+const replitDBFilename = "/tmp/replitdb";
 
-class Client {
+export default class Client {
+  private _key: string; // use this.key internally
+
+  private lastKeyRefreshTime: number | undefined;
+
   /**
    * Initiates Class.
    * @param {String} key Custom database URL
    */
-  constructor(key) {
+  constructor(key?: string) {
     if (key) {
-      this.key = key;
+      this._key = key;
     } else {
-      this.key = getKey();
-      setInterval(() => {
-        this.key = getKey();
-      }, 1000 * 60 * 60);
+      this._key = getKey();
+      this.lastKeyRefreshTime = Date.now();
     }
+  }
+
+  private get key(): string {
+    if (!this.lastKeyRefreshTime) {
+      return this._key;
+    }
+
+    if (Date.now() < this.lastKeyRefreshTime + 1000 * 60 * 60) {
+      return this._key;
+    }
+
+    // refresh key
+    this._key = getKey();
+    this.lastKeyRefreshTime = Date.now();
+
+    return this._key;
   }
 
   // Native Functions
@@ -25,7 +43,7 @@ class Client {
    * @param {String} key Key
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
-  async get(key, options) {
+  async get(key: string, options?: { raw: boolean }) {
     return await fetch(this.key + "/" + key)
       .then((e) => e.text())
       .then((strValue) => {
@@ -43,7 +61,7 @@ class Client {
           value = JSON.parse(strValue);
         } catch (_err) {
           throw new SyntaxError(
-            `Failed to parse value of ${key}, try passing a raw option to get the raw value`
+            `Failed to parse value of ${key}, try passing a raw option to get the raw value`,
           );
         }
 
@@ -60,7 +78,7 @@ class Client {
    * @param {String} key Key
    * @param {any} value Value
    */
-  async set(key, value) {
+  async set<Value>(key: string, value: Value) {
     const strValue = JSON.stringify(value);
 
     await fetch(this.key, {
@@ -75,8 +93,8 @@ class Client {
    * Deletes a key
    * @param {String} key Key
    */
-  async delete(key) {
-    await fetch(this.key + "/" + key, { method: "DELETE" });
+  async delete(key: string) {
+    await fetch(this.key + "/" + encodeURIComponent(key), { method: "DELETE" });
     return this;
   }
 
@@ -84,9 +102,9 @@ class Client {
    * List key starting with a prefix or list all.
    * @param {String} prefix Filter keys starting with prefix.
    */
-  async list(prefix = "") {
+  async list(prefix: string = "") {
     return await fetch(
-      this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`
+      this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`,
     )
       .then((r) => r.text())
       .then((t) => {
@@ -102,7 +120,7 @@ class Client {
    * Clears the database.
    */
   async empty() {
-    const promises = [];
+    const promises: Array<Promise<this>> = [];
     for (const key of await this.list()) {
       promises.push(this.delete(key));
     }
@@ -116,7 +134,7 @@ class Client {
    * Get all key/value pairs and return as an object
    */
   async getAll() {
-    let output = {};
+    let output: Record<string, string | null> = {};
     for (const key of await this.list()) {
       let value = await this.get(key);
       output[key] = value;
@@ -128,7 +146,7 @@ class Client {
    * Sets the entire database through an object.
    * @param {Object} obj The object.
    */
-  async setAll(obj) {
+  async setAll(obj: Record<string, any>) {
     for (const key in obj) {
       let val = obj[key];
       await this.set(key, val);
@@ -140,8 +158,8 @@ class Client {
    * Delete multiple entries by keys
    * @param {Array<string>} args Keys
    */
-  async deleteMultiple(...args) {
-    const promises = [];
+  async deleteMultiple(...args: Array<string>) {
+    const promises: Array<Promise<this>> = [];
 
     for (const arg of args) {
       promises.push(this.delete(arg));
@@ -153,12 +171,10 @@ class Client {
   }
 }
 
-module.exports = Client;
-
-function getKey() {
+function getKey(): string {
   try {
-    return fs.readFileSync(replitDBFilename, "utf8");
+    return readFileSync(replitDBFilename, "utf8");
   } catch (err) {
-    return process.env.REPLIT_DB_URL;
+    return process.env.REPLIT_DB_URL ?? "";
   }
 }
