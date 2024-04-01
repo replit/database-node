@@ -1,22 +1,37 @@
-const fetch = require("node-fetch");
-const fs = require("fs");
+import { readFileSync } from "fs";
 
-const replitDBFilename = "/tmp/replitdb"
+export default class Client {
+  private _dbUrl: string; // use this.dbUrl internally
 
-class Client {
+  private lastDbUrlRefreshTime: number | undefined;
+
   /**
    * Initiates Class.
-   * @param {String} key Custom database URL
+   * @param {String} dbUrl Custom database URL
    */
-  constructor(key) {
-    if (key) {
-      this.key = key;
+  constructor(dbUrl?: string) {
+    if (dbUrl) {
+      this._dbUrl = dbUrl;
     } else {
-      this.key = getKey();
-      setInterval(() => {
-        this.key = getKey();
-      }, 1000 * 60 * 60);
+      this._dbUrl = getDbUrl();
+      this.lastDbUrlRefreshTime = Date.now();
     }
+  }
+
+  private get dbUrl(): string {
+    if (!this.lastDbUrlRefreshTime) {
+      return this._dbUrl;
+    }
+
+    if (Date.now() < this.lastDbUrlRefreshTime + 1000 * 60 * 60) {
+      return this._dbUrl;
+    }
+
+    // refresh url
+    this._dbUrl = getDbUrl();
+    this.lastDbUrlRefreshTime = Date.now();
+
+    return this._dbUrl;
   }
 
   // Native Functions
@@ -25,8 +40,8 @@ class Client {
    * @param {String} key Key
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
-  async get(key, options) {
-    return await fetch(this.key + "/" + key)
+  async get(key: string, options?: { raw: boolean }) {
+    return await fetch(this.dbUrl + "/" + key)
       .then((e) => e.text())
       .then((strValue) => {
         if (options && options.raw) {
@@ -43,7 +58,7 @@ class Client {
           value = JSON.parse(strValue);
         } catch (_err) {
           throw new SyntaxError(
-            `Failed to parse value of ${key}, try passing a raw option to get the raw value`
+            `Failed to parse value of ${key}, try passing a raw option to get the raw value`,
           );
         }
 
@@ -60,10 +75,10 @@ class Client {
    * @param {String} key Key
    * @param {any} value Value
    */
-  async set(key, value) {
+  async set(key: string, value: any) {
     const strValue = JSON.stringify(value);
 
-    await fetch(this.key, {
+    await fetch(this.dbUrl, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
@@ -75,8 +90,10 @@ class Client {
    * Deletes a key
    * @param {String} key Key
    */
-  async delete(key) {
-    await fetch(this.key + "/" + key, { method: "DELETE" });
+  async delete(key: string) {
+    await fetch(this.dbUrl + "/" + encodeURIComponent(key), {
+      method: "DELETE",
+    });
     return this;
   }
 
@@ -84,9 +101,9 @@ class Client {
    * List key starting with a prefix or list all.
    * @param {String} prefix Filter keys starting with prefix.
    */
-  async list(prefix = "") {
+  async list(prefix: string = "") {
     return await fetch(
-      this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`
+      this.dbUrl + `?encode=true&prefix=${encodeURIComponent(prefix)}`,
     )
       .then((r) => r.text())
       .then((t) => {
@@ -102,7 +119,7 @@ class Client {
    * Clears the database.
    */
   async empty() {
-    const promises = [];
+    const promises: Array<Promise<this>> = [];
     for (const key of await this.list()) {
       promises.push(this.delete(key));
     }
@@ -114,11 +131,12 @@ class Client {
 
   /**
    * Get all key/value pairs and return as an object
+   * @param {boolean} [options.raw=false] Makes it so that we return the raw string value for each key. Default is false.
    */
-  async getAll() {
-    let output = {};
+  async getAll(options?: { raw: boolean }) {
+    let output: Record<string, string | null> = {};
     for (const key of await this.list()) {
-      let value = await this.get(key);
+      let value = await this.get(key, options);
       output[key] = value;
     }
     return output;
@@ -128,7 +146,7 @@ class Client {
    * Sets the entire database through an object.
    * @param {Object} obj The object.
    */
-  async setAll(obj) {
+  async setAll(obj: Record<string, any>) {
     for (const key in obj) {
       let val = obj[key];
       await this.set(key, val);
@@ -140,8 +158,8 @@ class Client {
    * Delete multiple entries by keys
    * @param {Array<string>} args Keys
    */
-  async deleteMultiple(...args) {
-    const promises = [];
+  async deleteMultiple(...args: Array<string>) {
+    const promises: Array<Promise<this>> = [];
 
     for (const arg of args) {
       promises.push(this.delete(arg));
@@ -153,12 +171,18 @@ class Client {
   }
 }
 
-module.exports = Client;
-
-function getKey() {
+const replitDBFilename = "/tmp/replitdb";
+function getDbUrl(): string {
+  let dbUrl: string | undefined;
   try {
-    return fs.readFileSync(replitDBFilename, "utf8");
+    dbUrl = readFileSync(replitDBFilename, "utf8");
   } catch (err) {
-    return process.env.REPLIT_DB_URL;
+    dbUrl = process.env.REPLIT_DB_URL;
   }
+
+  if (!dbUrl) {
+    throw new Error("expected dbUrl, got undefined");
+  }
+
+  return dbUrl;
 }

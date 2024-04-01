@@ -1,26 +1,38 @@
 {
   "name": "@replit/database",
   "version": "2.0.5",
-  "description": "Client for Repl.it Database",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest"
+  "engines": {
+    "node": ">=18"
   },
-  "contributors": [
-    {
-      "name": "Junhao Zhang",
-      "url": "https://github.com/mrlapizgithub/repl.it-db"
-    }
-  ],
-  "license": "MIT",
+  "description": "Client for Repl.it Database",
+  "homepage": "https://docs.replit.com/hosting/databases/replit-database",
   "repository": {
     "type": "git",
     "url": "https://github.com/replit/database-node.git"
   },
-  "dependencies": {
-    "node-fetch": "^2.6.0"
+  "license": "MIT",
+  "scripts": {
+    "build": "rm -rf dist && tsup src/index.ts --platform node --dts --format esm,cjs",
+    "test": "vitest run src/*"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": {
+        "default": "./dist/index.mjs"
+      },
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
-    "jest": "^26.1.0"
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.3",
+    "vitest": "^1.4.0"
   }
 }
