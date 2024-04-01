@@ -3,7 +3,7 @@
   "version": "2.0.5",
   "description": "Client for Repl.it Database",
   "scripts": {
-    "build": "unbuild",
+    "build": "rm -rf dist && tsup src/index.ts --dts --format esm,cjs",
     "test": "jest"
   },
   "license": "MIT",
@@ -14,7 +14,7 @@
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.js"
     }
   },
   "main": "./dist/index.cjs",
@@ -30,7 +30,7 @@
     "@types/node-fetch": "^2.6.11",
     "jest": "^29.0.0",
     "ts-jest": "^29.1.2",
-    "typescript": "^5.4.3",
-    "unbuild": "^2.0.0"
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.3"
   }
 }

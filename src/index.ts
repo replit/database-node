@@ -1,40 +1,38 @@
 import fetch from "node-fetch";
 import { readFileSync } from "fs";
 
-const replitDBFilename = "/tmp/replitdb";
-
 export default class Client {
-  private _key: string; // use this.key internally
+  private _dbUrl: string; // use this.dbUrl internally
 
-  private lastKeyRefreshTime: number | undefined;
+  private lastDbUrlRefreshTime: number | undefined;
 
   /**
    * Initiates Class.
-   * @param {String} key Custom database URL
+   * @param {String} dbUrl Custom database URL
    */
-  constructor(key?: string) {
-    if (key) {
-      this._key = key;
+  constructor(dbUrl?: string) {
+    if (dbUrl) {
+      this._dbUrl = dbUrl;
     } else {
-      this._key = getKey();
-      this.lastKeyRefreshTime = Date.now();
+      this._dbUrl = getDbUrl();
+      this.lastDbUrlRefreshTime = Date.now();
     }
   }
 
-  private get key(): string {
-    if (!this.lastKeyRefreshTime) {
-      return this._key;
+  private get dbUrl(): string {
+    if (!this.lastDbUrlRefreshTime) {
+      return this._dbUrl;
     }
 
-    if (Date.now() < this.lastKeyRefreshTime + 1000 * 60 * 60) {
-      return this._key;
+    if (Date.now() < this.lastDbUrlRefreshTime + 1000 * 60 * 60) {
+      return this._dbUrl;
     }
 
-    // refresh key
-    this._key = getKey();
-    this.lastKeyRefreshTime = Date.now();
+    // refresh url
+    this._dbUrl = getDbUrl();
+    this.lastDbUrlRefreshTime = Date.now();
 
-    return this._key;
+    return this._dbUrl;
   }
 
   // Native Functions
@@ -44,7 +42,7 @@ export default class Client {
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
   async get(key: string, options?: { raw: boolean }) {
-    return await fetch(this.key + "/" + key)
+    return await fetch(this.dbUrl + "/" + key)
       .then((e) => e.text())
       .then((strValue) => {
         if (options && options.raw) {
@@ -78,10 +76,10 @@ export default class Client {
    * @param {String} key Key
    * @param {any} value Value
    */
-  async set<Value>(key: string, value: Value) {
+  async set(key: string, value: any) {
     const strValue = JSON.stringify(value);
 
-    await fetch(this.key, {
+    await fetch(this.dbUrl, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
@@ -94,7 +92,9 @@ export default class Client {
    * @param {String} key Key
    */
   async delete(key: string) {
-    await fetch(this.key + "/" + encodeURIComponent(key), { method: "DELETE" });
+    await fetch(this.dbUrl + "/" + encodeURIComponent(key), {
+      method: "DELETE",
+    });
     return this;
   }
 
@@ -104,7 +104,7 @@ export default class Client {
    */
   async list(prefix: string = "") {
     return await fetch(
-      this.key + `?encode=true&prefix=${encodeURIComponent(prefix)}`,
+      this.dbUrl + `?encode=true&prefix=${encodeURIComponent(prefix)}`,
     )
       .then((r) => r.text())
       .then((t) => {
@@ -172,17 +172,18 @@ export default class Client {
   }
 }
 
-function getKey(): string {
-  let key: string | undefined;
+const replitDBFilename = "/tmp/replitdb";
+function getDbUrl(): string {
+  let dbUrl: string | undefined;
   try {
-    key = readFileSync(replitDBFilename, "utf8");
+    dbUrl = readFileSync(replitDBFilename, "utf8");
   } catch (err) {
-    key = process.env.REPLIT_DB_URL;
+    dbUrl = process.env.REPLIT_DB_URL;
   }
 
-  if (!key) {
-    throw new Error("expected key, got undefined");
+  if (!dbUrl) {
+    throw new Error("expected dbUrl, got undefined");
   }
 
-  return key;
+  return dbUrl;
 }

@@ -35,7 +35,7 @@ afterEach(async () => {
 
 test("create a client with a key", async () => {
   expect(client).toBeTruthy();
-  expect(typeof client["key"]).toBe("string");
+  expect(typeof client["dbUrl"]).toBe("string");
 });
 
 test("sets a value", async () => {
