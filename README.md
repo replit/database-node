@@ -1,9 +1,9 @@
 [![npm version](https://badge.fury.io/js/%40replit%2Fdatabase.svg)](https://badge.fury.io/js/%40replit%2Fdatabase)
 
-[![Run on Repl.it](https://repl.it/badge/github/replit/database-node)](https://repl.it/github/replit/database-node)
+[![Run on Replit](https://replit.com/badge/github/replit/database-node)](https://replit.com/github/replit/database-node)
 
-# Repl.it Database client
-Repl.it Database client is a simple way to use Repl.it Database in your Node.js repls. It uses `await/async`.
+# Replit Database client
+Replit Database client is a simple way to use Replit Database in your Node.js repls. It uses `await/async`.
 
 ## Get started
 ```js
@@ -20,7 +20,7 @@ The key is the optional custom URL.
 
 **Native Functions**
 
-These functions are specified in the repl.it DB.
+These functions are specified in the Replit DB.
 
 > `get(String key, Object options?)`
 
