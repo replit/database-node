@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import Client from "../index";
 
 let client: Client;
