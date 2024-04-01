@@ -1,4 +1,5 @@
-import Client from "../index";
+import { beforeAll, afterEach, test, expect } from "vitest";
+import Client from "../.";
 
 let client: Client;
 
@@ -77,6 +78,18 @@ test("delete a value", async () => {
   );
   expect(await client.list()).toEqual(["key"]);
   expect(await client.empty()).toEqual(client);
+  expect(await client.list()).toEqual([]);
+});
+
+test("delete a value with a key with newlines", async () => {
+  await client.setAll({
+    "key\nnewline": "value",
+    key: "nonewline",
+  });
+
+  expect(await client.delete("key")).toEqual(client);
+  expect(await client.list()).toEqual(["key\nnewline"]);
+  expect(await client.delete("key\nnewline")).toEqual(client);
   expect(await client.list()).toEqual([]);
 });
 

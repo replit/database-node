@@ -7,3 +7,6 @@ channel = "stable-23_05"
 
 [gitHubImport]
 requiredFiles = [".replit", "package.json", "package-lock.json"]
+
+[[ports]]
+localPort = 24678 #vitest
