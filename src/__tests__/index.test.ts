@@ -39,62 +39,95 @@ test("create a client with a key", async () => {
 });
 
 test("sets a value", async () => {
-  expect(await client.set("key", "value")).toEqual(client);
-  expect(await client.setAll({ key: "value", second: "secondThing" })).toEqual(
-    client,
-  );
+  expect((await client.set("key", "value")).value).toEqual(client);
+  expect(
+    (await client.setMultiple({ key: "value", second: "secondThing" })).value,
+  ).toEqual(client);
 });
 
 test("list keys", async () => {
-  await client.setAll({
+  await client.setMultiple({
     key: "value",
     second: "secondThing",
   });
 
-  const result = await client.list();
+  const result = (await client.list()).value;
   const expected = ["key", "second"];
   expect(result).toEqual(expect.arrayContaining(expected));
 });
 
 test("gets a value", async () => {
-  await client.setAll({
+  await client.set("key", "value");
+
+  expect((await client.get("key")).value).toEqual("value");
+});
+
+test("gets a value with forward slash in the key", async () => {
+  await client.set("k/e/y", "v/a/l/u/e");
+
+  expect((await client.get("k/e/y")).value).toEqual("v/a/l/u/e");
+});
+
+// uncomment after https://github.com/replit/goval/pull/12994
+// test("gets a value double forward slashes in the key", async () => {
+//   await client.set("k//e//y", "value");
+
+//   expect((await client.get("k//e//y")).value).toEqual("value");
+// });
+
+test("get many values", async () => {
+  await client.setMultiple({
     key: "value",
+    another: "value",
   });
 
-  expect(await client.getAll()).toEqual({ key: "value" });
+  expect((await client.getAll()).value).toEqual({
+    key: "value",
+    another: "value",
+  });
 });
 
 test("delete a value", async () => {
-  await client.setAll({
+  await client.setMultiple({
     key: "value",
     deleteThis: "please",
     somethingElse: "in delete multiple",
     andAnother: "again same thing",
   });
 
-  expect(await client.delete("deleteThis")).toEqual(client);
-  expect(await client.deleteMultiple("somethingElse", "andAnother")).toEqual(
-    client,
-  );
-  expect(await client.list()).toEqual(["key"]);
-  expect(await client.empty()).toEqual(client);
-  expect(await client.list()).toEqual([]);
+  expect((await client.delete("deleteThis")).value).toEqual(client);
+  expect(
+    (await client.deleteMultiple("somethingElse", "andAnother")).value,
+  ).toEqual(client);
+  expect((await client.list()).value).toEqual(["key"]);
+  expect((await client.empty()).value).toEqual(client);
+  expect((await client.list()).value).toEqual([]);
 });
 
 test("delete a value with a key with newlines", async () => {
-  await client.setAll({
+  await client.setMultiple({
     "key\nnewline": "value",
     key: "nonewline",
   });
 
-  expect(await client.delete("key")).toEqual(client);
-  expect(await client.list()).toEqual(["key\nnewline"]);
-  expect(await client.delete("key\nnewline")).toEqual(client);
-  expect(await client.list()).toEqual([]);
+  expect((await client.delete("key")).value).toEqual(client);
+  expect((await client.list()).value).toEqual(["key\nnewline"]);
+  expect((await client.delete("key\nnewline")).value).toEqual(client);
+  expect((await client.list()).value).toEqual([]);
 });
 
+// uncomment after https://github.com/replit/goval/pull/12994
+// test("delete a value with a key with double forward slashes", async () => {
+//   await client.set("k//e//y", "value");
+
+//   expect((await client.delete("k//e//y")).value).toEqual(client);
+//   const result = await client.get("k//e//y");
+//   expect(result.ok).toEqual(false);
+//   expect(result.error?.statusCode).toEqual(404);
+// });
+
 test("list keys with newline", async () => {
-  await client.setAll({
+  await client.setMultiple({
     "key\nwit": "first",
     keywidout: "second",
   });
@@ -102,11 +135,18 @@ test("list keys with newline", async () => {
   const expected = ["keywidout", "key\nwit"];
   const result = await client.list();
 
-  expect(result).toEqual(expect.arrayContaining(expected));
+  expect(result.value).toEqual(expect.arrayContaining(expected));
 });
 
 test("ensure that we escape values when setting", async () => {
-  expect(await client.set("a", "1;b=2")).toEqual(client);
-  expect(await client.list()).toEqual(["a"]);
-  expect(await client.get("a")).toEqual("1;b=2");
+  expect((await client.set("a", "1;b=2")).value).toEqual(client);
+  expect((await client.list()).value).toEqual(["a"]);
+  expect((await client.get("a")).value).toEqual("1;b=2");
+});
+
+test("getting an error", async () => {
+  await client.set("key", "value");
+
+  expect((await client.get("key2")).ok).toBeFalsy();
+  expect((await client.get("key2")).error?.statusCode).toEqual(404);
 });
