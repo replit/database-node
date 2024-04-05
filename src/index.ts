@@ -1,4 +1,5 @@
-import { readFileSync } from "fs";
+import { RequestError, doFetch, getDbUrl } from "./request";
+import { Err, ErrResult, Ok, OkResult } from "./result";
 
 export default class Client {
   private _dbUrl: string; // use this.dbUrl internally
@@ -34,40 +35,40 @@ export default class Client {
     return this._dbUrl;
   }
 
-  // Native Functions
   /**
    * Gets a key
    * @param {String} key Key
    * @param {boolean} [options.raw=false] Makes it so that we return the raw string value. Default is false.
    */
-  async get(key: string, options?: { raw: boolean }) {
-    return await fetch(this.dbUrl + "/" + key)
-      .then((e) => e.text())
-      .then((strValue) => {
-        if (options && options.raw) {
-          return strValue;
-        }
+  async get(
+    key: string,
+    options?: { raw: boolean },
+  ): Promise<OkResult<any> | ErrResult<RequestError>> {
+    const response = await doFetch({
+      urlPath: `${this.dbUrl}/${key}`,
+    });
+    if (!response.ok) {
+      return Err(response.error);
+    }
 
-        if (!strValue) {
-          return null;
-        }
+    const text = await response.value.text();
+    if (options && options.raw) {
+      return Ok(text);
+    }
 
-        let value = strValue;
-        try {
-          // Try to parse as JSON, if it fails, we throw
-          value = JSON.parse(strValue);
-        } catch (_err) {
-          throw new SyntaxError(
-            `Failed to parse value of ${key}, try passing a raw option to get the raw value`,
-          );
-        }
+    if (!text) {
+      return Ok(null);
+    }
 
-        if (value === null || value === undefined) {
-          return null;
-        }
-
-        return value;
+    try {
+      // Try to parse as JSON, if it fails, we return an error
+      const parsed = JSON.parse(text);
+      return Ok(parsed === null || parsed === undefined ? null : parsed);
+    } catch {
+      return Err({
+        message: `Failed to parse value of ${key}, try passing a raw option to get the raw value`,
       });
+    }
   }
 
   /**
@@ -75,114 +76,154 @@ export default class Client {
    * @param {String} key Key
    * @param {any} value Value
    */
-  async set(key: string, value: any) {
+  async set(
+    key: string,
+    value: any,
+  ): Promise<OkResult<this> | ErrResult<RequestError, unknown>> {
     const strValue = JSON.stringify(value);
 
-    await fetch(this.dbUrl, {
+    const response = await doFetch({
+      urlPath: this.dbUrl,
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: encodeURIComponent(key) + "=" + encodeURIComponent(strValue),
     });
-    return this;
+
+    if (response.ok) {
+      return Ok(this);
+    } else {
+      return Err(response.error);
+    }
   }
 
   /**
    * Deletes a key
    * @param {String} key Key
    */
-  async delete(key: string) {
-    await fetch(this.dbUrl + "/" + encodeURIComponent(key), {
+  async delete(
+    key: string,
+  ): Promise<OkResult<this> | ErrResult<RequestError, unknown>> {
+    const response = await doFetch({
+      urlPath: `${this.dbUrl}/${encodeURIComponent(key)}`,
       method: "DELETE",
     });
-    return this;
+
+    if (response.ok) {
+      return Ok(this);
+    } else {
+      return Err(response.error);
+    }
   }
 
   /**
-   * List key starting with a prefix or list all.
-   * @param {String} prefix Filter keys starting with prefix.
+   * List key starting with a prefix if provided. Otherwise list all keys.
+   * @param {String} prefix The prefix to filter by.
    */
-  async list(prefix: string = "") {
-    return await fetch(
-      this.dbUrl + `?encode=true&prefix=${encodeURIComponent(prefix)}`,
-    )
-      .then((r) => r.text())
-      .then((t) => {
-        if (t.length === 0) {
-          return [];
-        }
-        return t.split("\n").map(decodeURIComponent);
-      });
+  async list(
+    prefix: string = "",
+  ): Promise<OkResult<string[]> | ErrResult<RequestError, unknown>> {
+    const response = await doFetch({
+      urlPath: `${this.dbUrl}?encode=true&prefix=${encodeURIComponent(prefix)}`,
+    });
+
+    if (!response.ok) {
+      return Err(response.error);
+    }
+
+    const text = await response.value.text();
+    if (!text.length) {
+      return Ok([]);
+    }
+
+    return Ok(text.split("\n").map(decodeURIComponent));
   }
 
-  // Dynamic Functions
   /**
    * Clears the database.
+   * @returns a Promise containing this
    */
   async empty() {
-    const promises: Array<Promise<this>> = [];
-    for (const key of await this.list()) {
+    const keys = await this.list();
+    if (!keys.ok) {
+      return Err(keys.error);
+    }
+
+    const promises: Array<ReturnType<Client["delete"]>> = [];
+    for (const key of keys.value) {
       promises.push(this.delete(key));
     }
 
-    await Promise.all(promises);
+    const response = await Promise.all(promises);
+    const errors = response.filter((r) => !r.ok).map((r) => r.error);
+    if (errors.length) {
+      return Err({ message: "Failed to empty databse" }, errors);
+    }
 
-    return this;
+    return Ok(this);
   }
 
   /**
    * Get all key/value pairs and return as an object
-   * @param {boolean} [options.raw=false] Makes it so that we return the raw string value for each key. Default is false.
+   * @param {boolean} [options.raw=false] Makes it so that we return the raw
+   * string value for each key. Default is false.
    */
   async getAll(options?: { raw: boolean }) {
-    let output: Record<string, string | null> = {};
-    for (const key of await this.list()) {
-      let value = await this.get(key, options);
-      output[key] = value;
+    const keys = await this.list();
+    if (!keys.ok) {
+      return Err(keys.error);
     }
-    return output;
+
+    let output: Record<string, string | null> = {};
+    for (const key of keys.value) {
+      const value = await this.get(key, options);
+      if (!value.ok) {
+        return Err(value.error);
+      }
+      output[key] = value.value;
+    }
+
+    return Ok(output);
   }
 
   /**
-   * Sets the entire database through an object.
+   * Sets multiple keys from an object.
    * @param {Object} obj The object.
    */
-  async setAll(obj: Record<string, any>) {
+  async setMultiple(obj: Record<string, any>) {
+    const promises: Array<ReturnType<Client["set"]>> = [];
+
     for (const key in obj) {
       let val = obj[key];
-      await this.set(key, val);
+      promises.push(this.set(key, val));
     }
-    return this;
+
+    const response = await Promise.all(promises);
+    const errors = response.filter((r) => !r.ok).map((r) => r.error);
+    if (errors.length) {
+      return Err({ message: "Failed to set multiple" }, errors);
+    }
+
+    return Ok(this);
   }
 
   /**
-   * Delete multiple entries by keys
+   * Delete multiple entries by key.
    * @param {Array<string>} args Keys
    */
   async deleteMultiple(...args: Array<string>) {
-    const promises: Array<Promise<this>> = [];
+    const promises: Array<ReturnType<Client["delete"]>> = [];
 
     for (const arg of args) {
       promises.push(this.delete(arg));
     }
 
-    await Promise.all(promises);
+    const response = await Promise.all(promises);
+    const errors = response.filter((r) => !r.ok).map((r) => r.error);
 
-    return this;
+    if (errors.length) {
+      return Err({ message: "Failed to delete keys" }, errors);
+    }
+
+    return Ok(this);
   }
-}
-
-const replitDBFilename = "/tmp/replitdb";
-function getDbUrl(): string {
-  let dbUrl: string | undefined;
-  try {
-    dbUrl = readFileSync(replitDBFilename, "utf8");
-  } catch (err) {
-    dbUrl = process.env.REPLIT_DB_URL;
-  }
-
-  if (!dbUrl) {
-    throw new Error("expected dbUrl, got undefined");
-  }
-
-  return dbUrl;
 }
