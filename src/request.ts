@@ -16,16 +16,20 @@ export async function doFetch({
 }: {
   urlPath: string;
 } & RequestInit): Promise<Result<Response, RequestError>> {
-  const response = await fetch(new URL(urlPath), rest);
+  try {
+    const response = await fetch(new URL(urlPath), rest);
 
-  if (response.status !== 200 && response.status !== 204) {
-    return Err({
-      message: await response.text(),
-      statusCode: response.status,
-    });
+    if (response.status !== 200 && response.status !== 204) {
+      return Err({
+        message: await response.text(),
+        statusCode: response.status,
+      });
+    }
+
+    return Ok(response);
+  } catch (e) {
+    return Err({ message: e instanceof Error ? e.message : "unknown error" });
   }
-
-  return Ok(response);
 }
 
 const replitDBFilename = "/tmp/replitdb";
