@@ -45,7 +45,7 @@ export default class Client {
     options?: { raw: boolean },
   ): Promise<OkResult<any> | ErrResult<RequestError>> {
     const response = await doFetch({
-      urlPath: `${this.dbUrl}/${key}`,
+      urlPath: `${this.dbUrl}/${encodeURIComponent(key)}`,
     });
     if (!response.ok) {
       return Err(response.error);
