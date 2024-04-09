@@ -68,12 +68,11 @@ test("gets a value with forward slash in the key", async () => {
   expect((await client.get("k/e/y")).value).toEqual("v/a/l/u/e");
 });
 
-// uncomment after https://github.com/replit/goval/pull/12994
-// test("gets a value double forward slashes in the key", async () => {
-//   await client.set("k//e//y", "value");
+test("gets a value double forward slashes in the key", async () => {
+  await client.set("k//e//y", "value");
 
-//   expect((await client.get("k//e//y")).value).toEqual("value");
-// });
+  expect((await client.get("k//e//y")).value).toEqual("value");
+});
 
 test("get many values", async () => {
   await client.setMultiple({
@@ -116,15 +115,14 @@ test("delete a value with a key with newlines", async () => {
   expect((await client.list()).value).toEqual([]);
 });
 
-// uncomment after https://github.com/replit/goval/pull/12994
-// test("delete a value with a key with double forward slashes", async () => {
-//   await client.set("k//e//y", "value");
+test("delete a value with a key with double forward slashes", async () => {
+  await client.set("k//e//y", "value");
 
-//   expect((await client.delete("k//e//y")).value).toEqual(client);
-//   const result = await client.get("k//e//y");
-//   expect(result.ok).toEqual(false);
-//   expect(result.error?.statusCode).toEqual(404);
-// });
+  expect((await client.delete("k//e//y")).value).toEqual(client);
+  const result = await client.get("k//e//y");
+  expect(result.ok).toEqual(false);
+  expect(result.error?.statusCode).toEqual(404);
+});
 
 test("list keys with newline", async () => {
   await client.setMultiple({
