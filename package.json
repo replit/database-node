@@ -12,17 +12,15 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf dist && tsup src/index.ts --platform node --dts --format esm,cjs",
+    "build": "rm -rf dist/ && tsup src/index.ts --format cjs,esm --dts",
+    "prepublishOnly": "npm run build",
     "test": "vitest run src/*"
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": {
-        "default": "./dist/index.mjs"
-      },
       "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "main": "./dist/index.js",
