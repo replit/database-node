@@ -29,6 +29,7 @@
     "dist"
   ],
   "devDependencies": {
+    "@types/node": "^18.11.18",
     "tsup": "^7.2.0",
     "typescript": "^5.4.3",
     "vitest": "^1.4.0"
