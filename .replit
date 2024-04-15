@@ -1,6 +1,6 @@
 run = "npm run test"
 hidden = [".config", "package-lock.json"]
-modules = ["nodejs-with-prybar-18:v26-20240401-269b323"]
+modules = ["nodejs-18:v35-20240401-269b323"]
 
 [nix]
 channel = "stable-23_05"
