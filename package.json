@@ -14,7 +14,7 @@
   "scripts": {
     "build": "rm -rf dist/ && tsup src/index.ts --format cjs,esm --dts",
     "prepublishOnly": "npm run build",
-    "test": "vitest run src/*"
+    "test": "vitest run test/*"
   },
   "exports": {
     ".": {
@@ -29,7 +29,7 @@
     "dist"
   ],
   "devDependencies": {
-    "tsup": "^8.0.2",
+    "tsup": "^7.2.0",
     "typescript": "^5.4.3",
     "vitest": "^1.4.0"
   }

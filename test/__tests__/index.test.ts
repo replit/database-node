@@ -1,5 +1,5 @@
 import { beforeAll, afterEach, test, expect } from "vitest";
-import Client from "../.";
+import Client from "@replit/database";
 
 let client: Client;
 
