@@ -14,7 +14,7 @@
   "scripts": {
     "build": "rm -rf dist/ && tsup src/index.ts --platform node --format cjs,esm --dts --cjsInterop --splitting",
     "prepublishOnly": "npm run build",
-    "test": "npm run build && vitest run test/*"
+    "test": "npm run build && cd test && npm install && cd ../ && vitest run test/*"
   },
   "exports": {
     ".": {
