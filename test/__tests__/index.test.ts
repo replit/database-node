@@ -1,31 +1,11 @@
 import { beforeAll, afterEach, test, expect } from "vitest";
-import Client from "../.";
+import Client from "@replit/database";
+import * as util from "../util";
 
 let client: Client;
 
 beforeAll(async () => {
-  if (process.env.REPL_ID) {
-    // testing locally
-    client = new Client();
-  } else {
-    // testing from CI
-    const pass = process.env.USE_FILE
-      ? process.env.RIDT_PASSWORD
-      : process.env.JWT_PASSWORD;
-    const url = process.env.USE_FILE
-      ? "https://database-test-ridt-util.replit.app"
-      : "https://database-test-jwt-util.replit.app";
-    const resp = await fetch(url, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(`test:${pass}`).toString(
-          "base64",
-        )}`,
-      },
-    });
-    const token = await resp.text();
-    client = new Client(token);
-  }
-
+  client = new Client(await util.getToken());
   await client.empty();
 });
 

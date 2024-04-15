@@ -1,0 +1,7 @@
+{
+  "name": "@replit/database-test",
+  "private": true,
+  "dependencies": {
+    "@replit/database": "file:.."
+  }
+}

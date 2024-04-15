@@ -12,17 +12,15 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "rm -rf dist && tsup src/index.ts --platform node --dts --format esm,cjs",
-    "test": "vitest run src/*"
+    "build": "rm -rf dist/ && tsup src/index.ts --platform node --format cjs,esm --dts --cjsInterop --splitting",
+    "prepublishOnly": "npm run build",
+    "test": "npm run build && cd test && npm install && cd ../ && vitest run test/*"
   },
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": {
-        "default": "./dist/index.mjs"
-      },
       "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
     }
   },
   "main": "./dist/index.js",
@@ -31,7 +29,8 @@
     "dist"
   ],
   "devDependencies": {
-    "tsup": "^8.0.2",
+    "@types/node": "^18.11.18",
+    "tsup": "^7.2.0",
     "typescript": "^5.4.3",
     "vitest": "^1.4.0"
   }

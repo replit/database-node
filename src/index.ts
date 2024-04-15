@@ -1,5 +1,5 @@
-import { RequestError, doFetch, getDbUrl } from "./request";
-import { Err, ErrResult, Ok, OkResult } from "./result";
+import { readFileSync } from "fs";
+import { Err, ErrResult, Ok, OkResult, Result } from "./result";
 
 export default class Client {
   private _dbUrl: string; // use this.dbUrl internally
@@ -226,4 +226,47 @@ export default class Client {
 
     return Ok(this);
   }
+}
+
+interface RequestError {
+  message: string;
+  statusCode?: number;
+}
+
+async function doFetch({
+  urlPath,
+  ...rest
+}: {
+  urlPath: string;
+} & RequestInit): Promise<Result<Response, RequestError>> {
+  try {
+    const response = await fetch(new URL(urlPath), rest);
+
+    if (response.status !== 200 && response.status !== 204) {
+      return Err({
+        message: await response.text(),
+        statusCode: response.status,
+      });
+    }
+
+    return Ok(response);
+  } catch (e) {
+    return Err({ message: e instanceof Error ? e.message : "unknown error" });
+  }
+}
+
+const replitDBFilename = "/tmp/replitdb";
+function getDbUrl(): string {
+  let dbUrl: string | undefined;
+  try {
+    dbUrl = readFileSync(replitDBFilename, "utf8");
+  } catch (err) {
+    dbUrl = process.env.REPLIT_DB_URL;
+  }
+
+  if (!dbUrl) {
+    throw new Error("expected dbUrl, got undefined");
+  }
+
+  return dbUrl;
 }
